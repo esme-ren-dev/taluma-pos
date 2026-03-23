@@ -1415,22 +1415,30 @@ function saveNewProduct() {
   showToast(`✓ ${name} 已新增`);
 }
 
+// 用本地時區格式化日期，避免 toISOString() 的 UTC 時差問題
+function formatLocalDate(d) {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 function prevDate() {
   const d = new Date(state.selectedDate + 'T00:00:00');
   d.setDate(d.getDate() - 1);
-  state.selectedDate = d.toISOString().slice(0, 10);
+  state.selectedDate = formatLocalDate(d);
   renderLog();
 }
 
 function nextDate() {
   const d = new Date(state.selectedDate + 'T00:00:00');
   d.setDate(d.getDate() + 1);
-  state.selectedDate = d.toISOString().slice(0, 10);
+  state.selectedDate = formatLocalDate(d);
   renderLog();
 }
 
 function jumpToToday() {
-  state.selectedDate = new Date().toISOString().slice(0, 10);
+  state.selectedDate = formatLocalDate(new Date());
   renderLog();
 }
 
