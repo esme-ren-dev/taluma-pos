@@ -1209,7 +1209,7 @@ function confirmMove() {
       time: move.time,
       type: '調貨',
       product: product.name,
-      qty: moveQty,
+      qty: parsedMoveQty,
       from: fromLoc.name,
       to: toLoc.name
     });
@@ -1285,7 +1285,7 @@ function confirmStockIn() {
       date: move.date,
       time: move.time,
       product: product.name,
-      qty: stockQty
+      qty: parsedStockQty
     });
   }
 
