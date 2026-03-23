@@ -659,7 +659,9 @@ async function syncToSheets(action, params) {
     updateSyncStatus('syncing');
     // 使用 text/plain 避免 CORS preflight（Apps Script 不支援 OPTIONS）
     // 使用 redirect: 'follow' 讓瀏覽器跟隨 302 重導向
-    const response = await fetch(APPS_SCRIPT_URL, {
+    // action 必須放在 URL query parameter，因為 doPost 用 e.parameter.action 讀取
+    const url = APPS_SCRIPT_URL + '?action=' + encodeURIComponent(action);
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(params),
