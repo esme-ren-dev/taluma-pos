@@ -62,6 +62,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 .sell-btn:disabled { background: #D0D0D0; color: #999; }
 .sell-btn:active:not(:disabled) { background: #192e6e; }
 
+.date-picker-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+.date-picker-row label { font-size: 13px; color: #666; white-space: nowrap; }
+.date-picker-row input[type="date"] { flex: 1; background: white; border: 1px solid #D0D0D0; border-radius: 8px; padding: 8px 12px; color: #111C31; font-size: 14px; font-family: inherit; }
+.date-picker-row .today-btn { background: #21409a; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.date-picker-row .today-btn:active { background: #192e6e; }
+
 .sale-summary { background: #111C31; border-radius: 8px; padding: 12px; margin-top: 8px; font-size: 14px; color: #a0a8b8; text-align: center; }
 .sale-summary .amount { font-size: 24px; color: #F9EBD7; font-weight: bold; }
 
@@ -199,6 +205,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 
 <!-- SELL PAGE -->
 <div id="page-sell" class="page active">
+  <div class="section-label">銷售日期</div>
+  <div class="date-picker-row">
+    <input type="date" id="sellDateInput" data-action-input="sellDate">
+    <button type="button" class="today-btn" data-action="sellDateToday">今天</button>
+  </div>
+
   <div class="section-label">通路</div>
   <div class="channel-grid" id="channelGrid"></div>
 
@@ -1106,8 +1118,10 @@ function confirmSell() {
   const discount = parseInt(document.getElementById('discountInput').value) || 0;
   const amount = (product.price * qty) - discount;
 
+  // 使用日期選擇器的值（預設今天），避免 toISOString 的 UTC 時差問題
+  const sellDate = document.getElementById('sellDateInput').value || formatLocalDate(new Date());
   const sale = {
-    date: new Date().toISOString().slice(0, 10),
+    date: sellDate,
     time: new Date().toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' }),
     channelId: selectedChannel,
     channelName: channel.name,
@@ -1499,7 +1513,8 @@ const actions = {
   changeQty: (id) => changeQty(parseInt(id)),
   changeMoveQty: (id) => changeMoveQty(parseInt(id)),
   openAddProductModal, closeAddProductModal, saveNewProduct,
-  prevDate, nextDate, jumpToToday, manualSync
+  prevDate, nextDate, jumpToToday, manualSync,
+  sellDateToday: () => { document.getElementById('sellDateInput').value = formatLocalDate(new Date()); }
 };
 
 document.addEventListener('click', function(e) {
@@ -1515,6 +1530,8 @@ document.addEventListener('click', function(e) {
 });
 
 // ===== INIT =====
+// 初始化銷售日期選擇器為今天
+document.getElementById('sellDateInput').value = formatLocalDate(new Date());
 renderSeriesFilter('sellSeriesFilter', 'sellSeries');
 renderChannels();
 renderProducts();
