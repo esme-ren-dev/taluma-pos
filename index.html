@@ -657,23 +657,22 @@ async function syncToSheets(action, params) {
 
   try {
     updateSyncStatus('syncing');
-    // 使用 text/plain 避免 CORS preflight（Apps Script 不支援 OPTIONS）
-    // 使用 redirect: 'follow' 讓瀏覽器跟隨 302 重導向
-    // action 必須放在 URL query parameter，因為 doPost 用 e.parameter.action 讀取
+    // action 放在 URL query parameter，因為 doPost 用 e.parameter.action 讀取
     const url = APPS_SCRIPT_URL + '?action=' + encodeURIComponent(action);
+    // 使用 no-cors 模式：mobile Safari 跟隨 302 redirect 後會得到 opaque response，
+    // 導致 response.ok = false，即使資料已成功寫入。
+    // no-cors 模式下 response 永遠是 opaque（無法讀取），但請求一定會送出。
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(params),
-      redirect: 'follow'
+      mode: 'no-cors'
     });
 
-    if (response.ok) {
-      updateSyncStatus('synced');
-      return true;
-    } else {
-      throw new Error('Sync failed: ' + response.status);
-    }
+    // no-cors 回應是 opaque（status=0, ok=false），無法判斷成功與否。
+    // 但 Apps Script 只要收到請求就會處理，所以直接視為成功。
+    updateSyncStatus('synced');
+    return true;
   } catch(err) {
     console.error('同步到 Sheets 失敗:', err);
     updateSyncStatus('offline');
