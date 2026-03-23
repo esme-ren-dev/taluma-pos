@@ -657,9 +657,11 @@ async function syncToSheets(action, params) {
 
   try {
     updateSyncStatus('syncing');
+    // 使用 text/plain 避免 CORS preflight（Apps Script 不支援 OPTIONS）
+    // 使用 redirect: 'follow' 讓瀏覽器跟隨 302 重導向
     const response = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(params),
       redirect: 'follow'
     });
@@ -668,7 +670,7 @@ async function syncToSheets(action, params) {
       updateSyncStatus('synced');
       return true;
     } else {
-      throw new Error('Sync failed');
+      throw new Error('Sync failed: ' + response.status);
     }
   } catch(err) {
     console.error('同步到 Sheets 失敗:', err);
