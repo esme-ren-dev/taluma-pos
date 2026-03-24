@@ -8,11 +8,21 @@
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 button { font-family: inherit; }
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #F9EBD7; color: #111C31; min-height: 100vh; padding-bottom: 80px; }
-.header { background: #111C31; padding: 16px; text-align: center; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #21409a; }
+.header { background: #111C31; padding: 16px; text-align: center; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #21409a; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .header h1 { font-size: 18px; color: #F9EBD7; letter-spacing: 2px; }
-.header .subtitle { font-size: 12px; color: #a0a8b8; margin-top: 4px; }
+.header .subtitle { font-size: 12px; color: #a0a8b8; }
+.header .sync-bar { display: flex; align-items: center; gap: 12px; width: 100%; justify-content: space-between; padding-top: 8px; border-top: 1px solid #1a2540; }
+.sync-bar .sync-btn { background: #21409a; color: white; border: none; padding: 4px 12px; border-radius: 12px; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+.sync-bar .sync-btn:active { background: #192e6e; }
+.sync-bar .sync-btn:disabled { background: #666; cursor: not-allowed; }
+.sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #a0a8b8; }
+.sync-status .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.sync-status .dot.synced { background: #4CAF50; }
+.sync-status .dot.offline { background: #FF9800; }
+.sync-status .dot.syncing { background: #21409a; animation: pulse 1s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-.tabs { display: flex; background: #111C31; border-bottom: 1px solid #1a2540; position: sticky; top: 58px; z-index: 99; overflow-x: auto; }
+.tabs { display: flex; background: #111C31; border-bottom: 1px solid #1a2540; position: sticky; top: 110px; z-index: 99; overflow-x: auto; }
 .tab { flex: 1; padding: 12px 8px; text-align: center; font-size: 13px; color: #8890a0; border: none; border-bottom: 2px solid transparent; cursor: pointer; background: transparent; white-space: nowrap; min-width: fit-content; }
 .tab.active { color: #F9EBD7; border-bottom-color: #21409a; }
 
@@ -38,6 +48,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 .qty-btn { width: 48px; height: 48px; border-radius: 50%; border: 1px solid #D0D0D0; background: white; color: #111C31; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .qty-btn:active { background: #21409a; color: white; }
 .qty-display { font-size: 32px; font-weight: bold; min-width: 40px; text-align: center; }
+.qty-input { font-size: 28px; font-weight: bold; width: 64px; text-align: center; border: 1px solid #D0D0D0; border-radius: 8px; background: white; color: #111C31; padding: 4px; -moz-appearance: textfield; }
+.qty-input::-webkit-outer-spin-button, .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.series-filter { display: flex; gap: 6px; margin-bottom: 8px; overflow-x: auto; padding-bottom: 4px; flex-wrap: nowrap; }
+.series-chip { padding: 5px 12px; border-radius: 16px; border: 1px solid #D0D0D0; background: white; color: #888; font-size: 12px; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
+.series-chip.active { background: #21409a; color: white; border-color: #21409a; }
 
 .discount-row { display: flex; gap: 8px; align-items: center; margin: 8px 0; }
 .discount-row label { font-size: 13px; color: #666; white-space: nowrap; }
@@ -46,6 +61,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 .sell-btn { width: 100%; padding: 16px; border-radius: 12px; border: none; background: #21409a; color: white; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 16px; letter-spacing: 2px; }
 .sell-btn:disabled { background: #D0D0D0; color: #999; }
 .sell-btn:active:not(:disabled) { background: #192e6e; }
+
+.date-picker-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+.date-picker-row label { font-size: 13px; color: #666; white-space: nowrap; }
+.date-picker-row input[type="date"] { flex: 1; background: white; border: 1px solid #D0D0D0; border-radius: 8px; padding: 8px 12px; color: #111C31; font-size: 14px; font-family: inherit; }
+.date-picker-row .today-btn { background: #21409a; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.date-picker-row .today-btn:active { background: #192e6e; }
 
 .sale-summary { background: #111C31; border-radius: 8px; padding: 12px; margin-top: 8px; font-size: 14px; color: #a0a8b8; text-align: center; }
 .sale-summary .amount { font-size: 24px; color: #F9EBD7; font-weight: bold; }
@@ -156,13 +177,42 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 .add-product-sheet .btn-row { display: flex; gap: 8px; margin-top: 16px; }
 .add-product-sheet .cancel { flex: 1; padding: 12px; background: #eee; color: #666; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
 .add-product-sheet .ok { flex: 1; padding: 12px; background: #21409a; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; }
+
+/* === EDIT MODAL === */
+.edit-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
+.edit-modal.show { display: flex; }
+.edit-sheet { background: white; border-radius: 16px 16px 0 0; padding: 24px; width: 100%; max-height: 80vh; overflow-y: auto; }
+.edit-sheet h3 { color: #111C31; margin-bottom: 16px; }
+.edit-sheet .btn-row { display: flex; gap: 8px; margin-top: 16px; }
+.edit-sheet .cancel { flex: 1; padding: 12px; background: #eee; color: #666; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+.edit-sheet .ok { flex: 1; padding: 12px; background: #21409a; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; }
+.log-item .edit-btn { color: #21409a; font-size: 14px; padding: 0 4px; cursor: pointer; margin-left: 4px; background: none; border: none; }
+.inv-card .edit-inv-btn { color: #21409a; font-size: 12px; padding: 2px 8px; cursor: pointer; background: none; border: 1px solid #21409a; border-radius: 12px; margin-left: 8px; }
+
+/* === CHANNEL ARCHIVE SETTINGS === */
+.settings-section { margin-top: 24px; padding-top: 16px; border-top: 1px solid #e8e0d5; }
+.settings-section h3 { font-size: 14px; color: #111C31; margin-bottom: 12px; }
+.archive-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: white; border-radius: 8px; margin-bottom: 6px; border: 1px solid #e8e0d5; }
+.archive-item .name { font-size: 14px; }
+.archive-item .archived-tag { font-size: 11px; color: #999; }
+.archive-toggle { padding: 6px 12px; border-radius: 8px; border: 1px solid #D0D0D0; background: white; font-size: 12px; cursor: pointer; }
+.archive-toggle.archived { background: #eee; color: #999; }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>TALUMA POS</h1>
-  <div class="subtitle">快速銷售紀錄系統</div>
+  <div style="width: 100%;">
+    <h1>TALUMA POS</h1>
+    <div class="subtitle">快速銷售紀錄系統</div>
+  </div>
+  <div class="sync-bar">
+    <button type="button" class="sync-btn" id="syncBtn" data-action="manualSync">同步</button>
+    <div class="sync-status">
+      <span class="dot synced" id="syncDot"></span>
+      <span id="syncText">未連線</span>
+    </div>
+  </div>
 </div>
 
 <div class="tabs">
@@ -175,17 +225,24 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 
 <!-- SELL PAGE -->
 <div id="page-sell" class="page active">
+  <div class="section-label">銷售日期</div>
+  <div class="date-picker-row">
+    <input type="date" id="sellDateInput" data-action-input="sellDate">
+    <button type="button" class="today-btn" data-action="sellDateToday">今天</button>
+  </div>
+
   <div class="section-label">通路</div>
   <div class="channel-grid" id="channelGrid"></div>
 
   <div class="section-label">商品</div>
+  <div class="series-filter" id="sellSeriesFilter"></div>
   <div class="product-grid" id="productGrid"></div>
   <button type="button" class="export-btn" data-action="openAddProductModal" style="margin-top: 12px; border-color: #21409a; color: #21409a;">+ 新增商品</button>
 
   <div class="section-label">數量</div>
   <div class="qty-row">
     <button type="button" class="qty-btn" data-action="changeQty" data-id="-1">−</button>
-    <div class="qty-display" id="qtyDisplay">1</div>
+    <input type="number" class="qty-input" id="qtyDisplay" value="1" min="1" data-action-input="sellQty">
     <button type="button" class="qty-btn" data-action="changeQty" data-id="1">+</button>
   </div>
 
@@ -220,7 +277,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 <div id="page-log" class="page">
   <div class="date-nav">
     <button type="button" data-action="prevDate">«</button>
-    <div class="current-date" id="currentDate">2026/03/21 (六)</div>
+    <div class="current-date" id="currentDate">2026/03/22 (日)</div>
     <button type="button" data-action="nextDate">»</button>
     <button type="button" class="today-btn" data-action="jumpToToday">今天</button>
   </div>
@@ -259,12 +316,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
     <div class="channel-grid" id="moveToGrid"></div>
 
     <div class="section-label">商品</div>
+    <div class="series-filter" id="moveSeriesFilter"></div>
     <div class="product-grid" id="moveProductGrid"></div>
 
     <div class="section-label">數量</div>
     <div class="qty-row">
       <button type="button" class="qty-btn" data-action="changeMoveQty" data-id="-1">−</button>
-      <div class="qty-display" id="moveQtyDisplay">1</div>
+      <input type="number" class="qty-input" id="moveQtyDisplay" value="1" min="1" data-action-input="moveQty">
       <button type="button" class="qty-btn" data-action="changeMoveQty" data-id="1">+</button>
     </div>
 
@@ -275,12 +333,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
     <div class="stock-in-hint">新增商品到家（總倉）作為新進貨或自製成品</div>
 
     <div class="section-label">商品</div>
+    <div class="series-filter" id="stockSeriesFilter"></div>
     <div class="product-grid" id="stockProductGrid"></div>
 
     <div class="section-label">進貨數量</div>
     <div class="qty-row">
       <button type="button" class="qty-btn" data-action="changeStockQty" data-id="-1">−</button>
-      <div class="qty-display" id="stockQtyDisplay">1</div>
+      <input type="number" class="qty-input" id="stockQtyDisplay" value="1" min="1" data-action-input="stockQty">
       <button type="button" class="qty-btn" data-action="changeStockQty" data-id="1">+</button>
     </div>
 
@@ -339,6 +398,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
     <h3>庫存警示</h3>
     <div id="analysisStockAlerts"></div>
   </div>
+
+  <!-- Channel Archive Settings -->
+  <div class="settings-section">
+    <h3>通路管理</h3>
+    <p style="font-size: 12px; color: #888; margin-bottom: 12px;">歸檔的通路不會在賣出/調貨介面顯示，歷史資料保留。</p>
+    <div id="channelArchiveList"></div>
+  </div>
 </div>
 
 <div class="confirm-modal" id="confirmModal">
@@ -364,10 +430,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
       <input type="number" id="newProductPrice" placeholder="0" min="0">
     </div>
     <div class="form-row">
-      <label>系列</label>
-      <select id="newProductSeries">
-        <option value="">-- 選擇系列 --</option>
+      <label>季節</label>
+      <select id="newProductSeason">
+        <option value="">-- 選擇季節 --</option>
       </select>
+    </div>
+    <div class="form-row">
+      <label>品項</label>
+      <select id="newProductType">
+        <option value="">-- 選擇品項 --</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>花色/系列名（選填）</label>
+      <input type="text" id="newProductSeries" placeholder="例如：綠葵">
     </div>
     <div class="btn-row" style="display: flex; gap: 8px; margin-top: 16px;">
       <button type="button" class="cancel" data-action="closeAddProductModal">取消</button>
@@ -376,52 +452,126 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
   </div>
 </div>
 
+<!-- 編輯庫存 Modal -->
+<div class="edit-modal" id="editInvModal">
+  <div class="edit-sheet">
+    <h3 id="editInvTitle">修改庫存</h3>
+    <div class="form-row">
+      <label>數量</label>
+      <input type="number" id="editInvQty" placeholder="0">
+    </div>
+    <div class="btn-row">
+      <button type="button" class="cancel" data-action="closeEditInvModal">取消</button>
+      <button type="button" class="ok" data-action="saveEditInv">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 編輯銷售紀錄 Modal -->
+<div class="edit-modal" id="editSaleModal">
+  <div class="edit-sheet">
+    <h3>修改銷售紀錄</h3>
+    <div class="form-row">
+      <label>數量</label>
+      <input type="number" id="editSaleQty" min="1">
+    </div>
+    <div class="form-row">
+      <label>折扣金額</label>
+      <input type="number" id="editSaleDiscount" min="0" value="0">
+    </div>
+    <div class="btn-row">
+      <button type="button" class="cancel" data-action="closeEditSaleModal">取消</button>
+      <button type="button" class="ok" data-action="saveEditSale">儲存</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
+// ===== CONFIG =====
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby9amBVKDnDjS-EI2N04IXe36PUy92h0FI-EVvZmzz9CQ85Z5pfZAK_LFApdRcLatx0/exec';
+
+// ===== SYNC STATE =====
+let syncState = {
+  isOnline: !APPS_SCRIPT_URL || APPS_SCRIPT_URL === '',
+  isSyncing: false,
+  lastSyncTime: 0
+};
+
 // ===== DATA =====
+// 季節/系列定義
+const SEASONS = [
+  { id: '2026SS', name: '尋草蒔歲（2026SS）' },
+  { id: '2026AW', name: '編年織日（2026AW）' },
+  { id: 'vintage', name: '老布重生' },
+  { id: 'selected', name: '嚴選布花' },
+];
+
+// 品項定義
+const PRODUCT_TYPES = ['髮圈', '小包', '扁包', '托特包', '化妝包', '筆電包'];
+
 const HARDCODED_PRODUCTS = [
-  { id: 'gk-tote', name: '綠葵托特包', price: 550, series: '綠葵' },
-  { id: 'gk-cos', name: '綠葵化妝包', price: 490, series: '綠葵' },
-  { id: 'gk-flat', name: '綠葵扁包', price: 390, series: '綠葵' },
-  { id: 'gk-sm', name: '綠葵小包', price: 390, series: '綠葵' },
-  { id: 'gk-hair', name: '綠葵髮圈', price: 100, series: '綠葵' },
-  { id: 'bk-tote', name: '棕葵托特包', price: 550, series: '棕葵' },
-  { id: 'bk-cos', name: '棕葵化妝包', price: 490, series: '棕葵' },
-  { id: 'bk-flat', name: '棕葵扁包', price: 390, series: '棕葵' },
-  { id: 'bk-sm', name: '棕葵小包', price: 390, series: '棕葵' },
-  { id: 'bk-hair', name: '棕葵髮圈', price: 100, series: '棕葵' },
-  { id: 'rq-tote', name: '紅茄托特包', price: 550, series: '紅茄' },
-  { id: 'rq-cos', name: '紅茄化妝包', price: 490, series: '紅茄' },
-  { id: 'rq-flat', name: '紅茄扁包', price: 390, series: '紅茄' },
-  { id: 'rq-sm', name: '紅茄小包', price: 390, series: '紅茄' },
-  { id: 'rq-hair', name: '紅茄髮圈', price: 100, series: '紅茄' },
-  { id: 'lq-tote', name: '綠茄托特包', price: 550, series: '綠茄' },
-  { id: 'lq-cos', name: '綠茄化妝包', price: 490, series: '綠茄' },
-  { id: 'lq-flat', name: '綠茄扁包', price: 390, series: '綠茄' },
-  { id: 'lq-sm', name: '綠茄小包', price: 390, series: '綠茄' },
-  { id: 'lq-hair', name: '綠茄髮圈', price: 100, series: '綠茄' },
-  { id: 'ab-cos', name: '古董藍化妝包', price: 490, series: '古董藍' },
-  { id: 'ab-flat', name: '古董藍扁包', price: 390, series: '古董藍' },
-  { id: 'ab-sm', name: '古董藍小包', price: 390, series: '古董藍' },
-  { id: 'bm-flat', name: '藍米帆布扁包', price: 390, series: '其他' },
-  { id: 'sb-tote', name: '條紋棕托特包', price: 550, series: '其他' },
-  { id: 'wh-hair', name: '白色楊柳紗髮圈', price: 80, series: '其他' },
-  { id: 'rc-hair', name: '紅格紋髮圈', price: 50, series: '其他' },
-  { id: 'lb-hair', name: '淺藍條紋髮圈', price: 100, series: '其他' },
-  { id: 'hz-hair', name: '人字紋髮圈', price: 100, series: '其他' },
-  { id: 'rd-sock', name: '圓點波浪紅襪', price: 300, series: '其他' },
+  // 尋草蒔歲 2026SS — 綠葵
+  { id: 'gk-tote', name: '綠葵托特包', price: 550, series: '綠葵', type: '托特包', season: '2026SS' },
+  { id: 'gk-cos', name: '綠葵化妝包', price: 490, series: '綠葵', type: '化妝包', season: '2026SS' },
+  { id: 'gk-flat', name: '綠葵扁包', price: 390, series: '綠葵', type: '扁包', season: '2026SS' },
+  { id: 'gk-sm', name: '綠葵小包', price: 390, series: '綠葵', type: '小包', season: '2026SS' },
+  { id: 'gk-hair', name: '綠葵髮圈', price: 100, series: '綠葵', type: '髮圈', season: '2026SS' },
+  // 尋草蒔歲 2026SS — 棕葵
+  { id: 'bk-tote', name: '棕葵托特包', price: 550, series: '棕葵', type: '托特包', season: '2026SS' },
+  { id: 'bk-cos', name: '棕葵化妝包', price: 490, series: '棕葵', type: '化妝包', season: '2026SS' },
+  { id: 'bk-flat', name: '棕葵扁包', price: 390, series: '棕葵', type: '扁包', season: '2026SS' },
+  { id: 'bk-sm', name: '棕葵小包', price: 390, series: '棕葵', type: '小包', season: '2026SS' },
+  { id: 'bk-hair', name: '棕葵髮圈', price: 100, series: '棕葵', type: '髮圈', season: '2026SS' },
+  // 尋草蒔歲 2026SS — 紅茄
+  { id: 'rq-tote', name: '紅茄托特包', price: 550, series: '紅茄', type: '托特包', season: '2026SS' },
+  { id: 'rq-cos', name: '紅茄化妝包', price: 490, series: '紅茄', type: '化妝包', season: '2026SS' },
+  { id: 'rq-flat', name: '紅茄扁包', price: 390, series: '紅茄', type: '扁包', season: '2026SS' },
+  { id: 'rq-sm', name: '紅茄小包', price: 390, series: '紅茄', type: '小包', season: '2026SS' },
+  { id: 'rq-hair', name: '紅茄髮圈', price: 100, series: '紅茄', type: '髮圈', season: '2026SS' },
+  // 尋草蒔歲 2026SS — 綠茄
+  { id: 'lq-tote', name: '綠茄托特包', price: 550, series: '綠茄', type: '托特包', season: '2026SS' },
+  { id: 'lq-cos', name: '綠茄化妝包', price: 490, series: '綠茄', type: '化妝包', season: '2026SS' },
+  { id: 'lq-flat', name: '綠茄扁包', price: 390, series: '綠茄', type: '扁包', season: '2026SS' },
+  { id: 'lq-sm', name: '綠茄小包', price: 390, series: '綠茄', type: '小包', season: '2026SS' },
+  { id: 'lq-hair', name: '綠茄髮圈', price: 100, series: '綠茄', type: '髮圈', season: '2026SS' },
+  // 老布重生 — 古董藍
+  { id: 'ab-cos', name: '古董藍化妝包', price: 490, series: '古董藍', type: '化妝包', season: 'vintage' },
+  { id: 'ab-flat', name: '古董藍扁包', price: 390, series: '古董藍', type: '扁包', season: 'vintage' },
+  { id: 'ab-sm', name: '古董藍小包', price: 390, series: '古董藍', type: '小包', season: 'vintage' },
+  // 嚴選布花
+  { id: 'bm-flat', name: '藍米帆布扁包', price: 390, series: '藍米帆布', type: '扁包', season: 'selected' },
+  { id: 'sb-tote', name: '條紋棕托特包', price: 550, series: '條紋棕', type: '托特包', season: 'selected' },
+  { id: 'wh-hair', name: '白色楊柳紗髮圈', price: 80, series: '白色楊柳紗', type: '髮圈', season: 'selected' },
+  { id: 'rc-hair', name: '紅格紋髮圈', price: 50, series: '紅格紋', type: '髮圈', season: 'selected' },
+  { id: 'lb-hair', name: '淺藍條紋髮圈', price: 100, series: '淺藍條紋', type: '髮圈', season: 'selected' },
+  { id: 'hz-hair', name: '人字紋髮圈', price: 100, series: '人字紋', type: '髮圈', season: 'selected' },
+  { id: 'rd-sock', name: '圓點波浪紅襪', price: 300, series: '圓點波浪', type: '其他', season: 'selected' },
 ];
 
-const CHANNELS = [
-  { id: 'market', name: '市集' },
-  { id: 'website', name: '官網' },
-  { id: 'pinkoi', name: 'Pinkoi' },
-  { id: 'consign-sg', name: '時光造所' },
-  { id: 'consign-by', name: '邊緣工事' },
-  { id: 'consign-jg', name: '集光市' },
+const ALL_CHANNELS = [
+  { id: 'market', name: '市集', archived: false },
+  { id: 'website', name: '官網', archived: false },
+  { id: 'pinkoi', name: 'Pinkoi', archived: false },
+  { id: 'consign-sg', name: '時光造所', archived: false },
+  { id: 'consign-by', name: '邊緣工事', archived: false },
+  { id: 'consign-jg', name: '集光市', archived: false },
 ];
 
+// 讀取歸檔狀態
+const archivedChannels = loadData('archivedChannels', []);
+ALL_CHANNELS.forEach(c => { if (archivedChannels.includes(c.id)) c.archived = true; });
+
+// 使用中的通路（介面上顯示的）
+const CHANNELS = ALL_CHANNELS.filter(c => !c.archived);
+
+// LOCATIONS 包含所有通路（含歸檔），確保歷史庫存數據完整
+const ALL_LOCATIONS = [
+  { id: 'home', name: '家（總倉）' },
+  ...ALL_CHANNELS,
+];
+// 介面上顯示的地點（排除歸檔通路）
 const LOCATIONS = [
   { id: 'home', name: '家（總倉）' },
   ...CHANNELS,
@@ -436,12 +586,15 @@ let state = {
   moveTo: null,
   moveProduct: null,
   moveQty: 1,
-  moveMode: 'move', // 'move' or 'stock'
+  moveMode: 'move',
   stockProduct: null,
   stockQty: 1,
-  selectedDate: new Date().toISOString().slice(0, 10), // Current date for log page
+  selectedDate: new Date().toISOString().slice(0, 10),
   invSort: 'default',
   logSort: 'time-desc',
+  sellSeries: 'all',
+  moveSeries: 'all',
+  stockSeries: 'all',
 };
 
 function loadData(key, fallback) {
@@ -450,27 +603,22 @@ function loadData(key, fallback) {
 }
 function saveData(key, val) { localStorage.setItem('taluma_' + key, JSON.stringify(val)); }
 
-// Load custom products from localStorage
 let customProducts = loadData('customProducts', []);
-
-// Merge hardcoded and custom products
 let PRODUCTS = [...HARDCODED_PRODUCTS, ...customProducts];
 
 let inventory = loadData('inventory', {});
 let salesLog = loadData('salesLog', []);
 let moveLog = loadData('moveLog', []);
 
-// Init inventory if empty
 if (Object.keys(inventory).length === 0) {
-  LOCATIONS.forEach(loc => {
+  ALL_LOCATIONS.forEach(loc => {
     inventory[loc.id] = {};
     PRODUCTS.forEach(p => { inventory[loc.id][p.id] = 0; });
   });
   saveData('inventory', inventory);
 }
 
-// Ensure all locations/products exist
-LOCATIONS.forEach(loc => {
+ALL_LOCATIONS.forEach(loc => {
   if (!inventory[loc.id]) inventory[loc.id] = {};
   PRODUCTS.forEach(p => {
     if (inventory[loc.id][p.id] === undefined) inventory[loc.id][p.id] = 0;
@@ -481,9 +629,37 @@ function getTotalStock(productId) {
   return Object.values(inventory).reduce((sum, loc) => sum + (loc[productId] || 0), 0);
 }
 
+function getUniqueTypes() {
+  const types = new Set(PRODUCTS.map(p => p.type));
+  return Array.from(types).sort();
+}
 function getUniqueSeries() {
   const series = new Set(PRODUCTS.map(p => p.series));
   return Array.from(series).sort();
+}
+
+function renderSeriesFilter(containerId, stateKey) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const types = getUniqueTypes();
+  const current = state[stateKey] || 'all';
+  container.innerHTML = [
+    `<button type="button" class="series-chip ${current === 'all' ? 'active' : ''}" data-action="setSeriesFilter" data-id="all|${stateKey}">全部</button>`,
+    ...types.map(t => `<button type="button" class="series-chip ${current === t ? 'active' : ''}" data-action="setSeriesFilter" data-id="${t}|${stateKey}">${t}</button>`)
+  ].join('');
+}
+
+function setSeriesFilter(combined) {
+  const [series, stateKey] = combined.split('|');
+  state[stateKey] = series;
+  if (stateKey === 'sellSeries') { renderSeriesFilter('sellSeriesFilter', 'sellSeries'); renderProducts(); }
+  else if (stateKey === 'moveSeries') { renderSeriesFilter('moveSeriesFilter', 'moveSeries'); renderMoveProducts(); }
+  else if (stateKey === 'stockSeries') { renderSeriesFilter('stockSeriesFilter', 'stockSeries'); renderStockProducts(); }
+}
+
+function getFilteredProducts(stateKey) {
+  const type = state[stateKey] || 'all';
+  return type === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.type === type);
 }
 
 function generateProductId() {
@@ -498,7 +674,127 @@ function formatDate(dateStr) {
   return `${parts[0]}/${parts[1]}/${parts[2]} (${days[day]})`;
 }
 
-// ===== RENDER =====
+// ===== SYNC HELPERS =====
+function updateSyncStatus(status, text) {
+  const dot = document.getElementById('syncDot');
+  const textEl = document.getElementById('syncText');
+  const btn = document.getElementById('syncBtn');
+
+  dot.classList.remove('synced', 'offline', 'syncing');
+
+  if (status === 'synced') {
+    dot.classList.add('synced');
+    textEl.textContent = '已同步';
+    btn.disabled = false;
+    syncState.isOnline = true;
+  } else if (status === 'offline') {
+    dot.classList.add('offline');
+    textEl.textContent = APPS_SCRIPT_URL ? '離線模式' : '未連線';
+    btn.disabled = !APPS_SCRIPT_URL;
+  } else if (status === 'syncing') {
+    dot.classList.add('syncing');
+    textEl.textContent = '同步中...';
+    btn.disabled = true;
+  }
+}
+
+async function initializeSync() {
+  if (!APPS_SCRIPT_URL) {
+    updateSyncStatus('offline');
+    return;
+  }
+
+  updateSyncStatus('syncing');
+  try {
+    const response = await fetch(`${APPS_SCRIPT_URL}?action=initSheets`);
+    if (!response.ok) throw new Error('初始化失敗');
+    await fullSync();
+    updateSyncStatus('synced');
+  } catch(err) {
+    console.error('初始化失敗:', err);
+    updateSyncStatus('offline');
+  }
+}
+
+async function fullSync() {
+  if (!APPS_SCRIPT_URL || syncState.isSyncing) return;
+
+  syncState.isSyncing = true;
+  updateSyncStatus('syncing');
+
+  try {
+    // 取得最新的銷售和庫存資料
+    const [salesRes, invRes, movesRes] = await Promise.all([
+      fetch(`${APPS_SCRIPT_URL}?action=getAllSales`),
+      fetch(`${APPS_SCRIPT_URL}?action=getInventory`),
+      fetch(`${APPS_SCRIPT_URL}?action=getMoves&date=${new Date().toISOString().slice(0, 10)}`)
+    ]);
+
+    if (salesRes.ok && invRes.ok) {
+      const salesData = await salesRes.json();
+      const invData = await invRes.json();
+
+      // 只在需要時更新本地資料
+      if (salesData.sales && salesData.sales.length > salesLog.length) {
+        salesLog = salesData.sales;
+        saveData('salesLog', salesLog);
+      }
+
+      if (invData.inventory && invData.inventory.length > 0) {
+        // 合併遠端庫存（遠端有值才覆蓋，不清空本地資料）
+        invData.inventory.forEach(item => {
+          const loc = LOCATIONS.find(l => l.name === item['來源'] || l.name === item.from);
+          if (!loc) return;
+          if (!inventory[loc.id]) inventory[loc.id] = {};
+          const prod = PRODUCTS.find(p => p.name === item['商品名稱'] || p.name === item.product);
+          if (prod && (typeof item.qty === 'number') && item.qty !== 0) {
+            inventory[loc.id][prod.id] = item.qty;
+          }
+        });
+        saveData('inventory', inventory);
+      }
+    }
+
+    syncState.isOnline = true;
+    updateSyncStatus('synced');
+  } catch(err) {
+    console.error('同步失敗:', err);
+    updateSyncStatus('offline');
+  } finally {
+    syncState.isSyncing = false;
+  }
+}
+
+async function syncToSheets(action, params) {
+  if (!APPS_SCRIPT_URL) return;
+
+  try {
+    updateSyncStatus('syncing');
+    // action 放在 URL query parameter，因為 doPost 用 e.parameter.action 讀取
+    const url = APPS_SCRIPT_URL + '?action=' + encodeURIComponent(action);
+    // 使用 no-cors 模式：mobile Safari 跟隨 302 redirect 後會得到 opaque response，
+    // 導致 response.ok = false，即使資料已成功寫入。
+    // no-cors 模式下 response 永遠是 opaque（無法讀取），但請求一定會送出。
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(params),
+      mode: 'no-cors'
+    });
+
+    // no-cors 回應是 opaque（status=0, ok=false），無法判斷成功與否。
+    // 但 Apps Script 只要收到請求就會處理，所以直接視為成功。
+    updateSyncStatus('synced');
+    return true;
+  } catch(err) {
+    console.error('同步到 Sheets 失敗:', err);
+    updateSyncStatus('offline');
+    // 本地資料已保存，稍後會同步
+    return false;
+  }
+}
+
+// ===== RENDER FUNCTIONS =====
 function renderChannels() {
   const grid = document.getElementById('channelGrid');
   grid.innerHTML = CHANNELS.map(c =>
@@ -508,7 +804,8 @@ function renderChannels() {
 
 function renderProducts() {
   const grid = document.getElementById('productGrid');
-  grid.innerHTML = PRODUCTS.map(p => {
+  const filtered = getFilteredProducts('sellSeries');
+  grid.innerHTML = filtered.map(p => {
     const total = getTotalStock(p.id);
     const lowClass = total <= 0 ? 'low' : '';
     return `<button type="button" class="product-btn ${state.selectedProduct === p.id ? 'selected' : ''}" data-action="selectProduct" data-id="${p.id}">
@@ -546,12 +843,10 @@ function renderInventory() {
     `<button type="button" class="filter-chip ${currentFilter === l ? 'active' : ''}" data-action="setInvFilter" data-id="${l}">${locNames[l]}</button>`
   ).join('');
 
-  // Update sort chips active state
   document.querySelectorAll('#page-inventory .sort-chip').forEach(c => {
     c.classList.toggle('active', c.dataset.id === state.invSort);
   });
 
-  // Sort products
   let sortedProducts = [...PRODUCTS];
   const sortMode = state.invSort;
   if (sortMode === 'stock-desc') {
@@ -592,7 +887,10 @@ function renderInventory() {
         const cls = q < 0 ? 'negative' : q <= 2 ? 'low' : '';
         html += `<div class="inv-card">
           <div><div class="name">${p.name}</div><div class="detail">$${p.price}</div></div>
-          <div class="stock-num ${cls}">${q}</div>
+          <div style="display:flex;align-items:center;">
+            <div class="stock-num ${cls}">${q}</div>
+            <button type="button" class="edit-inv-btn" data-action="editInventory" data-id="${currentFilter}|${p.id}">修改</button>
+          </div>
         </div>`;
       }
     }
@@ -606,7 +904,6 @@ function renderLog() {
   const totalAmount = selectedSales.reduce((sum, s) => sum + s.amount, 0);
   const totalItems = selectedSales.reduce((sum, s) => sum + s.qty, 0);
 
-  // Update date display
   document.getElementById('currentDate').textContent = formatDate(selectedDate);
 
   document.getElementById('todaySummary').innerHTML = `
@@ -614,18 +911,15 @@ function renderLog() {
     <div class="count">${formatDate(selectedDate)} · ${selectedSales.length} 筆交易，共 ${totalItems} 件商品</div>
   `;
 
-  // Update sort chips active state
   document.querySelectorAll('#page-log .sort-chip').forEach(c => {
     c.classList.toggle('active', c.dataset.id === state.logSort);
   });
 
-  // Build log items with original indices for delete
   const logItems = selectedSales.map(s => {
     const realIdx = salesLog.indexOf(s);
     return { ...s, realIdx };
   });
 
-  // Sort
   const logSort = state.logSort;
   if (logSort === 'time-desc') {
     logItems.reverse();
@@ -646,6 +940,7 @@ function renderLog() {
       </div>
       <div style="display:flex;align-items:center;">
         <div class="amount">$${s.amount}</div>
+        <button type="button" class="edit-btn" data-action="editSale" data-id="${s.realIdx}">✎</button>
         <button type="button" class="del-btn" data-action="deleteSale" data-id="${s.realIdx}">×</button>
       </div>
     </div>`;
@@ -653,7 +948,6 @@ function renderLog() {
 }
 
 function renderAnalysis() {
-  // Overview
   const totalRevenue = salesLog.reduce((sum, s) => sum + s.amount, 0);
   const totalTransactions = salesLog.length;
   const totalItems = salesLog.reduce((sum, s) => sum + s.qty, 0);
@@ -664,7 +958,6 @@ function renderAnalysis() {
   document.getElementById('analysisTotalItems').textContent = totalItems;
   document.getElementById('analysisAvgValue').textContent = `$${avgValue.toLocaleString()}`;
 
-  // Channel Revenue
   const channelRevenue = {};
   CHANNELS.forEach(c => { channelRevenue[c.id] = { name: c.name, revenue: 0 }; });
   salesLog.forEach(s => {
@@ -691,7 +984,6 @@ function renderAnalysis() {
   }).join('');
   document.getElementById('analysisChannelRevenue').innerHTML = channelHtml || '<div style="text-align:center;color:#666;padding:20px;">無銷售資料</div>';
 
-  // Top Products
   const productSales = {};
   PRODUCTS.forEach(p => { productSales[p.id] = { name: p.name, qty: 0, revenue: 0 }; });
   salesLog.forEach(s => {
@@ -715,10 +1007,9 @@ function renderAnalysis() {
   </div>`).join('');
   document.getElementById('analysisTopProducts').innerHTML = topHtml || '<div style="text-align:center;color:#666;padding:20px;">無銷售資料</div>';
 
-  // Monthly Trend
   const monthlyData = {};
   salesLog.forEach(s => {
-    const month = s.date.slice(0, 7); // YYYY-MM
+    const month = s.date.slice(0, 7);
     if (!monthlyData[month]) {
       monthlyData[month] = { revenue: 0, transactions: 0, items: 0 };
     }
@@ -751,7 +1042,6 @@ function renderAnalysis() {
   </table>` : '<div style="text-align:center;color:#666;padding:20px;">無銷售資料</div>';
   document.getElementById('analysisMonthlyTrend').innerHTML = monthlyHtml;
 
-  // Stock Alerts
   const alerts = [];
   PRODUCTS.forEach(p => {
     let hasNegative = false;
@@ -798,7 +1088,8 @@ function renderMoveLocations() {
 
 function renderMoveProducts() {
   const grid = document.getElementById('moveProductGrid');
-  grid.innerHTML = PRODUCTS.map(p => {
+  const filtered = getFilteredProducts('moveSeries');
+  grid.innerHTML = filtered.map(p => {
     const fromStock = state.moveFrom ? (inventory[state.moveFrom]?.[p.id] || 0) : 0;
     return `<button type="button" class="product-btn ${state.moveProduct === p.id ? 'selected' : ''}" data-action="selectMoveProduct" data-id="${p.id}">
       <div class="stock-badge ${fromStock <= 0 ? 'low' : ''}">${fromStock}</div>
@@ -821,7 +1112,8 @@ function renderMoveBtn() {
 
 function renderStockProducts() {
   const grid = document.getElementById('stockProductGrid');
-  grid.innerHTML = PRODUCTS.map(p => {
+  const filtered = getFilteredProducts('stockSeries');
+  grid.innerHTML = filtered.map(p => {
     return `<button type="button" class="product-btn ${state.stockProduct === p.id ? 'selected' : ''}" data-action="selectStockProduct" data-id="${p.id}">
       <div>${p.name}</div>
       <div class="price">$${p.price}</div>
@@ -865,25 +1157,30 @@ function renderMoveLog() {
 }
 
 function renderAddProductModal() {
-  const select = document.getElementById('newProductSeries');
-  const series = getUniqueSeries();
-  select.innerHTML = '<option value="">-- 選擇系列 --</option>' + series.map(s =>
-    `<option value="${s}">${s}</option>`
+  // 季節下拉
+  const seasonSelect = document.getElementById('newProductSeason');
+  seasonSelect.innerHTML = '<option value="">-- 選擇季節 --</option>' + SEASONS.map(s =>
+    `<option value="${s.id}">${s.name}</option>`
+  ).join('');
+  // 品項下拉
+  const typeSelect = document.getElementById('newProductType');
+  typeSelect.innerHTML = '<option value="">-- 選擇品項 --</option>' + PRODUCT_TYPES.map(t =>
+    `<option value="${t}">${t}</option>`
   ).join('') + '<option value="其他">其他</option>';
 }
 
 // ===== ACTIONS =====
 function selectChannel(id) { state.selectedChannel = id; renderChannels(); renderSellBtn(); }
 function selectProduct(id) { state.selectedProduct = id; renderProducts(); renderSellBtn(); }
-function changeQty(d) { state.qty = Math.max(1, state.qty + d); document.getElementById('qtyDisplay').textContent = state.qty; renderSellBtn(); }
+function changeQty(d) { state.qty = Math.max(1, (parseInt(state.qty) || 1) + d); document.getElementById('qtyDisplay').value = state.qty; renderSellBtn(); }
 
 function selectMoveFrom(id) { state.moveFrom = id; renderMoveLocations(); renderMoveProducts(); renderMoveBtn(); }
 function selectMoveTo(id) { state.moveTo = id; renderMoveLocations(); renderMoveBtn(); }
 function selectMoveProduct(id) { state.moveProduct = id; renderMoveProducts(); renderMoveBtn(); }
-function changeMoveQty(d) { state.moveQty = Math.max(1, state.moveQty + d); document.getElementById('moveQtyDisplay').textContent = state.moveQty; }
+function changeMoveQty(d) { state.moveQty = Math.max(1, (parseInt(state.moveQty) || 1) + d); document.getElementById('moveQtyDisplay').value = state.moveQty; }
 
 function selectStockProduct(id) { state.stockProduct = id; renderStockProducts(); renderStockBtn(); }
-function changeStockQty(d) { state.stockQty = Math.max(1, state.stockQty + d); document.getElementById('stockQtyDisplay').textContent = state.stockQty; }
+function changeStockQty(d) { state.stockQty = Math.max(1, (parseInt(state.stockQty) || 1) + d); document.getElementById('stockQtyDisplay').value = state.stockQty; }
 
 function setInvFilter(f) { state.invFilter = f; renderInventory(); }
 function setInvSort(s) { state.invSort = s; renderInventory(); }
@@ -897,184 +1194,374 @@ function setMoveMode(mode) {
   });
   document.getElementById('moveContainer').style.display = mode === 'move' ? 'block' : 'none';
   document.getElementById('stockInContainer').style.display = mode === 'stock' ? 'block' : 'none';
+  if (mode === 'stock') {
+    renderSeriesFilter('stockSeriesFilter', 'stockSeries');
+    renderStockProducts();
+    renderStockBtn();
+  } else {
+    renderSeriesFilter('moveSeriesFilter', 'moveSeries');
+    renderMoveLocations();
+    renderMoveProducts();
+    renderMoveBtn();
+  }
 }
 
-function prevDate() {
-  const date = new Date(state.selectedDate + 'T00:00:00');
-  date.setDate(date.getDate() - 1);
-  state.selectedDate = date.toISOString().slice(0, 10);
-  renderLog();
-}
-
-function nextDate() {
-  const date = new Date(state.selectedDate + 'T00:00:00');
-  date.setDate(date.getDate() + 1);
-  state.selectedDate = date.toISOString().slice(0, 10);
-  renderLog();
-}
-
-function jumpToToday() {
-  state.selectedDate = new Date().toISOString().slice(0, 10);
-  renderLog();
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    const tabs = ['sell', 'inventory', 'log', 'move', 'analysis'];
+    t.classList.toggle('active', tabs[i] === tab);
+  });
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  if (tab === 'inventory') renderInventory();
+  if (tab === 'log') renderLog();
+  if (tab === 'analysis') { renderAnalysis(); renderChannelArchive(); }
+  if (tab === 'move') { setMoveMode('move'); renderSeriesFilter('moveSeriesFilter', 'moveSeries'); renderMoveLocations(); renderMoveProducts(); renderMoveBtn(); renderSeriesFilter('stockSeriesFilter', 'stockSeries'); renderStockProducts(); renderStockBtn(); renderMoveLog(); }
 }
 
 function confirmSell() {
-  const p = PRODUCTS.find(x => x.id === state.selectedProduct);
-  const ch = CHANNELS.find(x => x.id === state.selectedChannel);
+  const { selectedChannel, selectedProduct, qty } = state;
+  if (!selectedChannel || !selectedProduct) return;
+
+  const channel = CHANNELS.find(c => c.id === selectedChannel);
+  const product = PRODUCTS.find(p => p.id === selectedProduct);
   const discount = parseInt(document.getElementById('discountInput').value) || 0;
-  const amount = (p.price * state.qty) - discount;
+  const amount = (product.price * qty) - discount;
 
-  showModal('確認賣出', `${ch.name}｜${p.name} × ${state.qty}\n讓利 $${discount}，實收 $${amount}`, () => {
-    if (!inventory[state.selectedChannel]) inventory[state.selectedChannel] = {};
-    inventory[state.selectedChannel][state.selectedProduct] = (inventory[state.selectedChannel][state.selectedProduct] || 0) - state.qty;
-    saveData('inventory', inventory);
+  // 使用日期選擇器的值（預設今天），避免 toISOString 的 UTC 時差問題
+  const sellDate = document.getElementById('sellDateInput').value || formatLocalDate(new Date());
+  const sale = {
+    date: sellDate,
+    time: new Date().toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+    channelId: selectedChannel,
+    channelName: channel.name,
+    productId: selectedProduct,
+    productName: product.name,
+    qty: qty,
+    amount: amount
+  };
 
-    const now = new Date();
-    salesLog.push({
-      date: now.toISOString().slice(0, 10),
-      time: now.toTimeString().slice(0, 5),
-      productId: state.selectedProduct,
-      productName: p.name,
-      productPrice: p.price,
-      channelId: state.selectedChannel,
-      channelName: ch.name,
-      qty: state.qty,
+  // 樂觀更新：先更新本地
+  salesLog.push(sale);
+  saveData('salesLog', salesLog);
+
+  // 更新庫存
+  if (!inventory[selectedChannel]) inventory[selectedChannel] = {};
+  inventory[selectedChannel][selectedProduct] = (inventory[selectedChannel][selectedProduct] || 0) - qty;
+  saveData('inventory', inventory);
+
+  // 背景同步到 Sheets
+  if (APPS_SCRIPT_URL) {
+    syncToSheets('addSale', {
+      action: 'addSale',
+      date: sale.date,
+      time: sale.time,
+      channel: channel.name,
+      product: product.name,
+      qty: qty,
+      unitPrice: product.price,
       discount: discount,
-      amount: amount,
+      amount: amount
     });
+  }
+
+  // 重置狀態
+  state.selectedChannel = null;
+  state.selectedProduct = null;
+  state.qty = 1;
+  document.getElementById('discountInput').value = '0';
+  renderChannels();
+  renderProducts();
+  renderSellBtn();
+  showToast(`✓ ${product.name} 已賣出`);
+}
+
+function deleteSale(idx) {
+  if (idx < 0 || idx >= salesLog.length) return;
+  const sale = salesLog[idx];
+
+  showModal('確認刪除', `確定要刪除 ${sale.productName} 的銷售紀錄嗎？`, () => {
+    salesLog.splice(idx, 1);
     saveData('salesLog', salesLog);
 
-    state.qty = 1;
-    document.getElementById('qtyDisplay').textContent = 1;
-    document.getElementById('discountInput').value = 0;
-    state.selectedProduct = null;
+    // 恢復庫存
+    if (inventory[sale.channelId]) {
+      inventory[sale.channelId][sale.productId] = (inventory[sale.channelId][sale.productId] || 0) + sale.qty;
+      saveData('inventory', inventory);
+    }
 
-    renderProducts(); renderSellBtn();
-    showToast(`✓ ${p.name} × ${state.qty || 1} 已記錄`);
+    // 背景同步刪除
+    if (APPS_SCRIPT_URL) {
+      syncToSheets('deleteSale', { action: 'deleteSale', row: idx });
+    }
+
+    renderLog();
+    showToast('✓ 紀錄已刪除');
   });
 }
 
+// ===== EDIT INVENTORY =====
+let editInvState = { locId: null, productId: null };
+
+function editInventory(locId, productId) {
+  const product = PRODUCTS.find(p => p.id === productId);
+  const loc = ALL_LOCATIONS.find(l => l.id === locId);
+  const currentQty = inventory[locId]?.[productId] || 0;
+  editInvState = { locId, productId };
+  document.getElementById('editInvTitle').textContent = `修改庫存：${product.name}（${loc.name}）`;
+  document.getElementById('editInvQty').value = currentQty;
+  document.getElementById('editInvModal').classList.add('show');
+  document.getElementById('editInvQty').focus();
+  document.getElementById('editInvQty').select();
+}
+
+function closeEditInvModal() {
+  document.getElementById('editInvModal').classList.remove('show');
+}
+
+function saveEditInv() {
+  const { locId, productId } = editInvState;
+  const newQty = parseInt(document.getElementById('editInvQty').value);
+  if (isNaN(newQty)) { showToast('請輸入數字'); return; }
+  inventory[locId][productId] = newQty;
+  saveData('inventory', inventory);
+  closeEditInvModal();
+  renderInventory();
+  renderProducts();
+  showToast('✓ 庫存已修改');
+}
+
+// ===== EDIT SALE =====
+let editSaleIdx = -1;
+
+function editSale(idx) {
+  if (idx < 0 || idx >= salesLog.length) return;
+  const sale = salesLog[idx];
+  const product = PRODUCTS.find(p => p.id === sale.productId);
+  editSaleIdx = idx;
+  document.getElementById('editSaleQty').value = sale.qty;
+  const originalTotal = product ? product.price * sale.qty : sale.amount;
+  document.getElementById('editSaleDiscount').value = Math.max(0, originalTotal - sale.amount);
+  document.getElementById('editSaleModal').classList.add('show');
+  document.getElementById('editSaleQty').focus();
+}
+
+function closeEditSaleModal() {
+  document.getElementById('editSaleModal').classList.remove('show');
+  editSaleIdx = -1;
+}
+
+function saveEditSale() {
+  if (editSaleIdx < 0 || editSaleIdx >= salesLog.length) return;
+  const sale = salesLog[editSaleIdx];
+  const product = PRODUCTS.find(p => p.id === sale.productId);
+  const newQty = parseInt(document.getElementById('editSaleQty').value) || 1;
+  const discount = parseInt(document.getElementById('editSaleDiscount').value) || 0;
+  const price = product ? product.price : Math.round(sale.amount / sale.qty);
+
+  // 恢復舊庫存
+  if (inventory[sale.channelId]) {
+    inventory[sale.channelId][sale.productId] = (inventory[sale.channelId][sale.productId] || 0) + sale.qty;
+  }
+  // 更新銷售紀錄
+  sale.qty = newQty;
+  sale.amount = (price * newQty) - discount;
+  // 扣除新庫存
+  if (inventory[sale.channelId]) {
+    inventory[sale.channelId][sale.productId] = (inventory[sale.channelId][sale.productId] || 0) - newQty;
+  }
+
+  saveData('salesLog', salesLog);
+  saveData('inventory', inventory);
+  closeEditSaleModal();
+  renderLog();
+  renderInventory();
+  showToast('✓ 銷售紀錄已修改');
+}
+
+// ===== CHANNEL ARCHIVE =====
+function renderChannelArchive() {
+  const list = document.getElementById('channelArchiveList');
+  if (!list) return;
+  list.innerHTML = ALL_CHANNELS.map(c => `
+    <div class="archive-item">
+      <div>
+        <span class="name">${c.name}</span>
+        ${c.archived ? ' <span class="archived-tag">（已歸檔）</span>' : ''}
+      </div>
+      <button type="button" class="archive-toggle ${c.archived ? 'archived' : ''}" data-action="toggleArchive" data-id="${c.id}">
+        ${c.archived ? '取消歸檔' : '歸檔'}
+      </button>
+    </div>
+  `).join('');
+}
+
+function toggleArchive(channelId) {
+  const ch = ALL_CHANNELS.find(c => c.id === channelId);
+  if (!ch) return;
+  ch.archived = !ch.archived;
+  const archived = ALL_CHANNELS.filter(c => c.archived).map(c => c.id);
+  saveData('archivedChannels', archived);
+
+  // 重建 CHANNELS 和 LOCATIONS
+  CHANNELS.length = 0;
+  ALL_CHANNELS.filter(c => !c.archived).forEach(c => CHANNELS.push(c));
+  LOCATIONS.length = 0;
+  LOCATIONS.push({ id: 'home', name: '家（總倉）' });
+  CHANNELS.forEach(c => LOCATIONS.push(c));
+
+  renderChannelArchive();
+  renderChannels();
+  showToast(ch.archived ? `✓ ${ch.name} 已歸檔` : `✓ ${ch.name} 已恢復`);
+}
+
 function confirmMove() {
-  const p = PRODUCTS.find(x => x.id === state.moveProduct);
-  const from = LOCATIONS.find(x => x.id === state.moveFrom);
-  const to = LOCATIONS.find(x => x.id === state.moveTo);
+  const { moveFrom, moveTo, moveProduct, moveQty } = state;
+  if (!moveFrom || !moveTo || !moveProduct) return;
 
-  showModal('確認調貨', `${p.name} × ${state.moveQty}\n${from.name} → ${to.name}`, () => {
-    inventory[state.moveFrom][state.moveProduct] = (inventory[state.moveFrom][state.moveProduct] || 0) - state.moveQty;
-    inventory[state.moveTo][state.moveProduct] = (inventory[state.moveTo][state.moveProduct] || 0) + state.moveQty;
-    saveData('inventory', inventory);
+  const fromLoc = LOCATIONS.find(l => l.id === moveFrom);
+  const toLoc = LOCATIONS.find(l => l.id === moveTo);
+  const product = PRODUCTS.find(p => p.id === moveProduct);
 
-    const now = new Date();
-    moveLog.push({
-      date: now.toISOString().slice(0, 10),
-      time: now.toTimeString().slice(0, 5),
-      productName: p.name,
-      from: from.name,
-      to: to.name,
-      qty: state.moveQty,
+  const move = {
+    date: formatLocalDate(new Date()),
+    time: new Date().toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+    from: fromLoc.name,
+    to: toLoc.name,
+    productId: moveProduct,
+    productName: product.name,
+    qty: moveQty
+  };
+
+  // 樂觀更新
+  moveLog.push(move);
+  saveData('moveLog', moveLog);
+
+  // 更新庫存
+  const parsedMoveQty = parseInt(moveQty) || 1;
+  inventory[moveFrom][moveProduct] = (inventory[moveFrom][moveProduct] || 0) - parsedMoveQty;
+  inventory[moveTo][moveProduct] = (inventory[moveTo][moveProduct] || 0) + parsedMoveQty;
+  saveData('inventory', inventory);
+
+  // 背景同步
+  if (APPS_SCRIPT_URL) {
+    syncToSheets('addMove', {
+      action: 'addMove',
+      date: move.date,
+      time: move.time,
+      type: '調貨',
+      product: product.name,
+      qty: parsedMoveQty,
+      from: fromLoc.name,
+      to: toLoc.name
     });
+  }
+
+  // 重置
+  state.moveFrom = null;
+  state.moveTo = null;
+  state.moveProduct = null;
+  state.moveQty = 1;
+  renderMoveLocations();
+  renderMoveProducts();
+  renderMoveBtn();
+  document.getElementById('moveQtyDisplay').value = '1';
+  renderMoveLog();
+  showToast(`✓ ${product.name} 已調貨`);
+}
+
+function deleteMove(idx) {
+  if (idx < 0 || idx >= moveLog.length) return;
+  const move = moveLog[idx];
+
+  showModal('確認刪除', `確定要刪除這筆調貨紀錄嗎？`, () => {
+    moveLog.splice(idx, 1);
     saveData('moveLog', moveLog);
 
-    state.moveQty = 1;
-    document.getElementById('moveQtyDisplay').textContent = 1;
-    state.moveProduct = null;
+    // 恢復庫存
+    const fromId = LOCATIONS.find(l => l.name === move.from)?.id;
+    const toId = LOCATIONS.find(l => l.name === move.to)?.id;
+    if (fromId && toId) {
+      inventory[fromId][move.productId] = (inventory[fromId][move.productId] || 0) + move.qty;
+      inventory[toId][move.productId] = (inventory[toId][move.productId] || 0) - move.qty;
+      saveData('inventory', inventory);
+    }
 
-    renderMoveProducts(); renderMoveBtn(); renderMoveLog();
-    showToast(`✓ ${p.name} 已從${from.name}調到${to.name}`);
+    // 背景同步
+    if (APPS_SCRIPT_URL) {
+      syncToSheets('deleteMove', { action: 'deleteMove', row: idx });
+    }
+
+    renderMoveLog();
+    showToast('✓ 紀錄已刪除');
   });
 }
 
 function confirmStockIn() {
-  const p = PRODUCTS.find(x => x.id === state.stockProduct);
-  const home = LOCATIONS.find(x => x.id === 'home');
+  const { stockProduct, stockQty } = state;
+  if (!stockProduct) return;
 
-  showModal('確認進貨', `${p.name} × ${state.stockQty}\n進貨到${home.name}`, () => {
-    if (!inventory['home']) inventory['home'] = {};
-    inventory['home'][state.stockProduct] = (inventory['home'][state.stockProduct] || 0) + state.stockQty;
-    saveData('inventory', inventory);
+  const product = PRODUCTS.find(p => p.id === stockProduct);
+  const move = {
+    date: new Date().toISOString().slice(0, 10),
+    time: new Date().toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+    from: '',
+    to: '家（總倉）',
+    productId: stockProduct,
+    productName: product.name,
+    qty: stockQty
+  };
 
-    const now = new Date();
-    moveLog.push({
-      date: now.toISOString().slice(0, 10),
-      time: now.toTimeString().slice(0, 5),
-      productName: p.name,
-      from: '進貨',
-      to: home.name,
-      qty: state.stockQty,
+  moveLog.push(move);
+  saveData('moveLog', moveLog);
+
+  // 增加家的庫存
+  const parsedStockQty = parseInt(stockQty) || 1;
+  inventory['home'][stockProduct] = (inventory['home'][stockProduct] || 0) + parsedStockQty;
+  saveData('inventory', inventory);
+
+  // 背景同步
+  if (APPS_SCRIPT_URL) {
+    syncToSheets('addStockIn', {
+      action: 'addStockIn',
+      date: move.date,
+      time: move.time,
+      product: product.name,
+      qty: parsedStockQty
     });
-    saveData('moveLog', moveLog);
+  }
 
-    state.stockQty = 1;
-    document.getElementById('stockQtyDisplay').textContent = 1;
-    state.stockProduct = null;
-
-    renderStockProducts(); renderStockBtn(); renderMoveLog();
-    showToast(`✓ ${p.name} × ${state.stockQty || 1} 已進貨到${home.name}`);
-  });
-}
-
-function deleteSale(idx) {
-  showModal('刪除紀錄', `確定要刪除這筆紀錄嗎？庫存會自動回補。`, () => {
-    const s = salesLog[idx];
-    inventory[s.channelId][s.productId] = (inventory[s.channelId][s.productId] || 0) + s.qty;
-    saveData('inventory', inventory);
-    salesLog.splice(idx, 1);
-    saveData('salesLog', salesLog);
-    renderLog(); renderProducts();
-    showToast('已刪除並回補庫存');
-  });
-}
-
-function deleteMove(idx) {
-  showModal('刪除調貨紀錄', `確定要刪除這筆調貨紀錄嗎？庫存會自動回補。`, () => {
-    const m = moveLog[idx];
-    // Reverse the move
-    const from = LOCATIONS.find(x => x.name === m.from);
-    const to = LOCATIONS.find(x => x.name === m.to);
-
-    if (from && to) {
-      const fromId = from.id;
-      const toId = to.id;
-      if (inventory[fromId] && inventory[toId]) {
-        const productId = PRODUCTS.find(p => p.name === m.productName)?.id;
-        if (productId) {
-          inventory[fromId][productId] = (inventory[fromId][productId] || 0) + m.qty;
-          inventory[toId][productId] = (inventory[toId][productId] || 0) - m.qty;
-          saveData('inventory', inventory);
-        }
-      }
-    }
-
-    moveLog.splice(idx, 1);
-    saveData('moveLog', moveLog);
-    renderMoveLog();
-    showToast('已刪除並回補庫存');
-  });
+  state.stockProduct = null;
+  state.stockQty = 1;
+  renderStockProducts();
+  renderStockBtn();
+  document.getElementById('stockQtyDisplay').value = '1';
+  renderMoveLog();
+  showToast(`✓ ${product.name} 進貨成功`);
 }
 
 function exportCSV() {
   const selectedDate = state.selectedDate;
   const selectedSales = salesLog.filter(s => s.date === selectedDate);
-  if (selectedSales.length === 0) { showToast('該日期無紀錄'); return; }
 
-  let csv = '日期,時間,通路,商品,數量,單價,讓利,實收\n';
+  let csv = '日期,時間,通路,商品,數量,單價,讓利,總銷售額\n';
   selectedSales.forEach(s => {
-    csv += `${s.date},${s.time},${s.channelName},${s.productName},${s.qty},${s.productPrice},${s.discount},${s.amount}\n`;
+    const row = `${s.date},${s.time},${s.channelName},${s.productName},${s.qty},${PRODUCTS.find(p => p.id === s.productId)?.price || 0},0,${s.amount}`;
+    csv += row + '\n';
   });
 
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `TALUMA_${selectedDate}.csv`;
+  a.download = `TALUMA_銷售_${selectedDate}.csv`;
   a.click();
 }
 
 function exportAllSalesCSV() {
-  if (salesLog.length === 0) { showToast('無銷售紀錄'); return; }
-
-  let csv = '日期,時間,通路,商品,數量,單價,讓利,實收\n';
+  let csv = '日期,時間,通路,商品,數量,單價,讓利,總銷售額\n';
   salesLog.forEach(s => {
-    csv += `${s.date},${s.time},${s.channelName},${s.productName},${s.qty},${s.productPrice},${s.discount},${s.amount}\n`;
+    const row = `${s.date},${s.time},${s.channelName},${s.productName},${s.qty},${PRODUCTS.find(p => p.id === s.productId)?.price || 0},0,${s.amount}`;
+    csv += row + '\n';
   });
 
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
@@ -1086,16 +1573,13 @@ function exportAllSalesCSV() {
 
 function exportInventoryCSV() {
   const today = new Date().toISOString().slice(0, 10);
+  const locIds = ['home', 'market', 'website', 'pinkoi', 'consign-sg', 'consign-by', 'consign-jg'];
+  const locNames = { home: '家（總倉）', market: '市集', website: '官網', pinkoi: 'Pinkoi', 'consign-sg': '時光造所', 'consign-by': '邊緣工事', 'consign-jg': '集光市' };
 
-  const locIds = LOCATIONS.map(l => l.id);
-  const locNames = LOCATIONS.map(l => l.name);
-
-  let csv = '商品名稱,單價,系列,' + locNames.join(',') + ',總計\n';
-
+  let csv = '商品名稱,單價,系列,' + locIds.map(id => locNames[id]).join(',') + ',總庫存\n';
   PRODUCTS.forEach(p => {
-    let total = 0;
     let row = `${p.name},${p.price},${p.series}`;
-
+    let total = 0;
     locIds.forEach(locId => {
       const qty = inventory[locId]?.[p.id] || 0;
       row += `,${qty}`;
@@ -1117,6 +1601,8 @@ function openAddProductModal() {
   renderAddProductModal();
   document.getElementById('newProductName').value = '';
   document.getElementById('newProductPrice').value = '';
+  document.getElementById('newProductSeason').value = '';
+  document.getElementById('newProductType').value = '';
   document.getElementById('newProductSeries').value = '';
   document.getElementById('addProductModal').classList.add('show');
   document.getElementById('newProductName').focus();
@@ -1129,7 +1615,9 @@ function closeAddProductModal() {
 function saveNewProduct() {
   const name = document.getElementById('newProductName').value.trim();
   const price = parseInt(document.getElementById('newProductPrice').value);
-  const series = document.getElementById('newProductSeries').value || '其他';
+  const season = document.getElementById('newProductSeason').value || 'selected';
+  const type = document.getElementById('newProductType').value || '其他';
+  const series = document.getElementById('newProductSeries').value.trim() || name;
 
   if (!name) { showToast('請輸入商品名稱'); return; }
   if (!price || price <= 0) { showToast('請輸入正確的單價'); return; }
@@ -1139,6 +1627,8 @@ function saveNewProduct() {
     name: name,
     price: price,
     series: series,
+    type: type,
+    season: season,
   };
 
   customProducts.push(newProduct);
@@ -1146,12 +1636,22 @@ function saveNewProduct() {
 
   PRODUCTS.push(newProduct);
 
-  // Add to inventory for all locations
   LOCATIONS.forEach(loc => {
     if (!inventory[loc.id]) inventory[loc.id] = {};
     inventory[loc.id][newProduct.id] = 0;
   });
   saveData('inventory', inventory);
+
+  // 背景同步
+  if (APPS_SCRIPT_URL) {
+    syncToSheets('addProduct', {
+      action: 'addProduct',
+      id: newProduct.id,
+      name: name,
+      price: price,
+      series: series
+    });
+  }
 
   closeAddProductModal();
   renderProducts();
@@ -1159,18 +1659,39 @@ function saveNewProduct() {
   showToast(`✓ ${name} 已新增`);
 }
 
-// ===== UI HELPERS =====
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach((t, i) => {
-    const tabs = ['sell', 'inventory', 'log', 'move', 'analysis'];
-    t.classList.toggle('active', tabs[i] === tab);
-  });
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + tab).classList.add('active');
-  if (tab === 'inventory') renderInventory();
-  if (tab === 'log') renderLog();
-  if (tab === 'analysis') renderAnalysis();
-  if (tab === 'move') { setMoveMode('move'); renderMoveLocations(); renderMoveProducts(); renderMoveBtn(); renderStockProducts(); renderStockBtn(); renderMoveLog(); }
+// 用本地時區格式化日期，避免 toISOString() 的 UTC 時差問題
+function formatLocalDate(d) {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function prevDate() {
+  const d = new Date(state.selectedDate + 'T00:00:00');
+  d.setDate(d.getDate() - 1);
+  state.selectedDate = formatLocalDate(d);
+  renderLog();
+}
+
+function nextDate() {
+  const d = new Date(state.selectedDate + 'T00:00:00');
+  d.setDate(d.getDate() + 1);
+  state.selectedDate = formatLocalDate(d);
+  renderLog();
+}
+
+function jumpToToday() {
+  state.selectedDate = formatLocalDate(new Date());
+  renderLog();
+}
+
+function manualSync() {
+  if (!APPS_SCRIPT_URL) {
+    showToast('尚未設定 Apps Script URL');
+    return;
+  }
+  fullSync();
 }
 
 let modalCallback = null;
@@ -1190,21 +1711,48 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// Update sale amount when discount changes
 document.getElementById('discountInput').addEventListener('input', renderSellBtn);
 
-// ===== EVENT DELEGATION (mobile-friendly) =====
+// Quantity input direct editing
+document.addEventListener('input', function(e) {
+  const actionInput = e.target.dataset.actionInput;
+  if (!actionInput || actionInput === 'sellDate') return;
+  const val = Math.max(1, parseInt(e.target.value) || 1);
+  if (actionInput === 'sellQty') { state.qty = val; renderSellBtn(); }
+  else if (actionInput === 'moveQty') { state.moveQty = val; }
+  else if (actionInput === 'stockQty') { state.stockQty = val; }
+});
+document.addEventListener('blur', function(e) {
+  const actionInput = e.target.dataset.actionInput;
+  if (!actionInput || actionInput === 'sellDate') return;
+  const val = Math.max(1, parseInt(e.target.value) || 1);
+  e.target.value = val;
+  if (actionInput === 'sellQty') { state.qty = val; renderSellBtn(); }
+  else if (actionInput === 'moveQty') { state.moveQty = val; }
+  else if (actionInput === 'stockQty') { state.stockQty = val; }
+}, true);
+
+// ===== EVENT DELEGATION =====
 const actions = {
   selectChannel, selectProduct, confirmSell, exportCSV, exportAllSalesCSV, exportInventoryCSV,
   selectMoveFrom, selectMoveTo, selectMoveProduct, confirmMove,
-  selectStockProduct, confirmStockIn, changeStockQty,
-  setInvFilter, setInvSort, setLogSort, deleteSale, deleteMove, closeModal,
+  selectStockProduct, confirmStockIn,
+  changeStockQty: (id) => changeStockQty(parseInt(id)),
+  setInvFilter, setInvSort, setLogSort, deleteSale, deleteMove, closeModal, setSeriesFilter,
   setMoveMode: (id) => setMoveMode(id),
   switchTab: (id) => switchTab(id),
   changeQty: (id) => changeQty(parseInt(id)),
   changeMoveQty: (id) => changeMoveQty(parseInt(id)),
   openAddProductModal, closeAddProductModal, saveNewProduct,
-  prevDate, nextDate, jumpToToday,
+  prevDate, nextDate, jumpToToday, manualSync,
+  sellDateToday: () => { document.getElementById('sellDateInput').value = formatLocalDate(new Date()); },
+  // 編輯功能
+  editInventory: (id) => { const [locId, productId] = id.split('|'); editInventory(locId, productId); },
+  closeEditInvModal, saveEditInv,
+  editSale: (id) => editSale(parseInt(id)),
+  closeEditSaleModal, saveEditSale,
+  // 通路歸檔
+  toggleArchive,
 };
 
 document.addEventListener('click', function(e) {
@@ -1220,9 +1768,13 @@ document.addEventListener('click', function(e) {
 });
 
 // ===== INIT =====
+// 初始化銷售日期選擇器為今天
+document.getElementById('sellDateInput').value = formatLocalDate(new Date());
+renderSeriesFilter('sellSeriesFilter', 'sellSeries');
 renderChannels();
 renderProducts();
 renderSellBtn();
+initializeSync();
 </script>
 </body>
 </html>
