@@ -237,8 +237,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
   <div class="section-label">商品</div>
   <div class="series-filter" id="sellSeriesFilter"></div>
   <div class="product-grid" id="productGrid"></div>
-  <button type="button" class="export-btn" data-action="openAddProductModal" style="margin-top: 12px; border-color: #21409a; color: #21409a;">+ 新增商品</button>
-
   <div class="section-label">數量</div>
   <div class="qty-row">
     <button type="button" class="qty-btn" data-action="changeQty" data-id="-1">−</button>
@@ -271,6 +269,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
     <button type="button" class="sort-chip" data-action="setInvSort" data-id="price-asc">價格低→高</button>
   </div>
   <div id="invList"></div>
+  <button type="button" class="export-btn" data-action="openAddProductModal" style="margin-top: 12px; border-color: #21409a; color: #21409a;">+ 新增商品</button>
 </div>
 
 <!-- LOG PAGE -->
@@ -332,9 +331,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
   <div id="stockInContainer" style="display: none;">
     <div class="stock-in-hint">新增商品到家（總倉）作為新進貨或自製成品</div>
 
+    <div class="section-label">進貨日期</div>
+    <div class="date-input-row" style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+      <input type="date" id="stockDateInput" data-action-input="stockDate">
+      <input type="time" id="stockTimeInput" data-action-input="stockTime">
+      <button type="button" class="today-btn" data-action="stockDateNow">現在</button>
+    </div>
+
     <div class="section-label">商品</div>
     <div class="series-filter" id="stockSeriesFilter"></div>
     <div class="product-grid" id="stockProductGrid"></div>
+    <button type="button" class="export-btn" data-action="openAddProductModal" style="margin-top: 8px; border-color: #21409a; color: #21409a;">+ 新增商品</button>
 
     <div class="section-label">進貨數量</div>
     <div class="qty-row">
@@ -346,7 +353,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
     <button type="button" class="sell-btn" id="stockBtn" disabled data-action="confirmStockIn">尚未選擇商品</button>
   </div>
 
-  <div class="section-label" style="margin-top: 24px;">調貨紀錄</div>
+  <div class="section-label" style="margin-top: 24px;">進倉/調貨紀錄</div>
   <div id="moveLogList" style="margin-bottom: 12px;"></div>
 </div>
 
@@ -391,6 +398,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
   <div class="analysis-section">
     <h3>月度趨勢</h3>
     <div id="analysisMonthlyTrend"></div>
+  </div>
+
+  <!-- Inventory Snapshot Section -->
+  <div class="analysis-section">
+    <h3>庫存快照</h3>
+    <div id="analysisInventorySnapshot"></div>
   </div>
 
   <!-- Stock Alerts Section -->
@@ -555,7 +568,7 @@ const ALL_CHANNELS = [
   { id: 'website', name: '官網', archived: false },
   { id: 'pinkoi', name: 'Pinkoi', archived: false },
   { id: 'consign-sg', name: '時光造所', archived: false },
-  { id: 'consign-by', name: '邊緣工事', archived: false },
+  { id: 'consign-by', name: '邊緣工事', archived: true },
   { id: 'consign-jg', name: '集光市', archived: false },
 ];
 
@@ -1073,6 +1086,28 @@ function renderAnalysis() {
     <div class="detail">${a.detail}</div>
   </div>`).join('') : '<div style="text-align:center;color:#999;padding:20px;font-size:12px;">暫無庫存警示</div>';
   document.getElementById('analysisStockAlerts').innerHTML = alertsHtml;
+
+  // 庫存快照
+  const activeLocs = LOCATIONS.filter(l => !l.archived);
+  let snapHtml = `<table class="monthly-table" style="font-size:12px;">
+    <thead><tr><th style="text-align:left;">商品</th>${activeLocs.map(l => `<th>${l.name}</th>`).join('')}<th style="font-weight:bold;">合計</th></tr></thead>
+    <tbody>`;
+  let grandTotal = 0;
+  PRODUCTS.forEach(p => {
+    let rowTotal = 0;
+    const cells = activeLocs.map(l => {
+      const q = inventory[l.id]?.[p.id] || 0;
+      rowTotal += q;
+      const color = q < 0 ? 'color:#c62828;font-weight:bold' : q === 0 ? 'color:#ccc' : '';
+      return `<td style="text-align:center;${color}">${q}</td>`;
+    }).join('');
+    grandTotal += rowTotal;
+    const totalColor = rowTotal < 0 ? 'color:#c62828;font-weight:bold' : rowTotal === 0 ? 'color:#ccc' : 'font-weight:bold';
+    snapHtml += `<tr><td style="text-align:left;">${p.name}</td>${cells}<td style="text-align:center;${totalColor}">${rowTotal}</td></tr>`;
+  });
+  snapHtml += `</tbody></table>
+    <div style="text-align:right;font-size:12px;color:#666;margin-top:4px;">總庫存：${grandTotal} 件</div>`;
+  document.getElementById('analysisInventorySnapshot').innerHTML = snapHtml;
 }
 
 function renderMoveLocations() {
@@ -1134,22 +1169,22 @@ function renderStockBtn() {
 }
 
 function renderMoveLog() {
-  const today = new Date().toISOString().slice(0, 10);
-  const todayMoves = moveLog.filter(m => m.date === today);
   const list = document.getElementById('moveLogList');
 
-  if (todayMoves.length === 0) {
-    list.innerHTML = '<div style="text-align:center;color:#999;padding:20px;font-size:12px;">今日無調貨紀錄</div>';
+  if (moveLog.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:#999;padding:20px;font-size:12px;">無進倉/調貨紀錄</div>';
     return;
   }
 
-  const allMoves = [...todayMoves].reverse();
-  list.innerHTML = allMoves.map((m, i) => {
-    const realIdx = moveLog.length - 1 - i;
+  const allMoves = [...moveLog].reverse();
+  list.innerHTML = allMoves.map((m, ri) => {
+    const realIdx = moveLog.length - 1 - ri;
+    const type = m.from === '' ? '進倉' : '調貨';
+    const route = m.from === '' ? `→ ${m.to}` : `${m.from} → ${m.to}`;
     return `<div class="move-log-item">
       <div class="left">
-        <div>${m.productName} × ${m.qty}</div>
-        <div class="time">${m.from} → ${m.to} · ${m.time}</div>
+        <div>${m.productName} × ${m.qty}　<span style="color:#21409a;font-size:11px;">${type}</span></div>
+        <div class="time">${m.date} ${m.time}　${route}</div>
       </div>
       <button type="button" class="del-btn" data-action="deleteMove" data-id="${realIdx}">×</button>
     </div>`;
@@ -1195,6 +1230,7 @@ function setMoveMode(mode) {
   document.getElementById('moveContainer').style.display = mode === 'move' ? 'block' : 'none';
   document.getElementById('stockInContainer').style.display = mode === 'stock' ? 'block' : 'none';
   if (mode === 'stock') {
+    setStockDateNow();
     renderSeriesFilter('stockSeriesFilter', 'stockSeries');
     renderStockProducts();
     renderStockBtn();
@@ -1497,14 +1533,23 @@ function deleteMove(idx) {
   });
 }
 
+function setStockDateNow() {
+  const now = new Date();
+  document.getElementById('stockDateInput').value = formatLocalDate(now);
+  document.getElementById('stockTimeInput').value = now.toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' });
+}
+
 function confirmStockIn() {
   const { stockProduct, stockQty } = state;
   if (!stockProduct) return;
 
+  const stockDate = document.getElementById('stockDateInput').value || formatLocalDate(new Date());
+  const stockTime = document.getElementById('stockTimeInput').value || new Date().toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' });
+
   const product = PRODUCTS.find(p => p.id === stockProduct);
   const move = {
-    date: new Date().toISOString().slice(0, 10),
-    time: new Date().toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+    date: stockDate,
+    time: stockTime,
     from: '',
     to: '家（總倉）',
     productId: stockProduct,
@@ -1746,6 +1791,7 @@ const actions = {
   openAddProductModal, closeAddProductModal, saveNewProduct,
   prevDate, nextDate, jumpToToday, manualSync,
   sellDateToday: () => { document.getElementById('sellDateInput').value = formatLocalDate(new Date()); },
+  stockDateNow: () => { setStockDateNow(); },
   // 編輯功能
   editInventory: (id) => { const [locId, productId] = id.split('|'); editInventory(locId, productId); },
   closeEditInvModal, saveEditInv,
