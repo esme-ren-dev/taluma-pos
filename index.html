@@ -113,7 +113,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 
 .stock-in-hint { font-size: 12px; color: #21409a; margin-bottom: 12px; padding: 8px; background: #eff5ff; border-radius: 6px; }
 
-.move-log-item { background: white; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e8e0d5; }
+.move-log-item { background: white; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e8e0d5; user-select: none; -webkit-user-select: none; }
 .move-log-item .left { flex: 1; }
 .move-log-item .time { font-size: 11px; color: #999; margin-top: 2px; }
 .move-log-item .del-btn { color: #ccc; font-size: 18px; padding: 0 4px; cursor: pointer; margin-left: 8px; background: none; border: none; }
@@ -1826,9 +1826,11 @@ initializeSync();
 // iOS Safari date/time 反白修正
 document.querySelectorAll('input[type="date"], input[type="time"]').forEach(el => {
   function fixColor() { el.style.color = '#111C31'; el.style.webkitTextFillColor = '#111C31'; }
+  el.addEventListener('focus', fixColor);
   el.addEventListener('change', fixColor);
   el.addEventListener('blur', fixColor);
   el.addEventListener('input', fixColor);
+  el.addEventListener('touchend', fixColor);
   fixColor();
 });
 </script>
