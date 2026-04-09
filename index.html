@@ -64,8 +64,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 
 .date-picker-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
 .date-picker-row label { font-size: 13px; color: #666; white-space: nowrap; }
-.date-picker-row input[type="date"],
-.date-picker-row input[type="time"] { flex: 1; background-color: #fff; border: 1px solid #D0D0D0; border-radius: 8px; padding: 8px 12px; color: #111C31; font-size: 16px; font-family: inherit; min-height: 42px; }
+.date-picker-row input[type="text"] { flex: 1; background-color: #fff; border: 1px solid #D0D0D0; border-radius: 8px; padding: 8px 12px; color: #111C31; font-size: 16px; font-family: inherit; min-height: 42px; }
 .date-picker-row .today-btn { background: #21409a; color: white; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; white-space: nowrap; }
 .date-picker-row .today-btn:active { background: #192e6e; }
 
@@ -228,7 +227,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 <div id="page-sell" class="page active">
   <div class="section-label">銷售日期</div>
   <div class="date-picker-row">
-    <input type="date" id="sellDateInput" data-action-input="sellDate">
+    <input type="text" id="sellDateInput" placeholder="YYYY-MM-DD" maxlength="10" inputmode="numeric" autocomplete="off" data-action-input="sellDate">
     <button type="button" class="today-btn" data-action="sellDateToday">今天</button>
   </div>
 
@@ -289,6 +288,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
     <button type="button" class="export-btn" data-action="exportAllSalesCSV" style="flex: 1; margin-bottom: 0; border-color: #c47a00; color: #c47a00;">匯出全部</button>
   </div>
 
+  <button type="button" onclick="importHistoricalData()" style="width:100%;padding:10px;border-radius:8px;border:1px solid #AB1A1A;background:transparent;color:#AB1A1A;font-size:13px;cursor:pointer;margin-bottom:12px;">⚠ 重置並匯入試算表歷史資料</button>
+
   <div class="sort-row">
     <button type="button" class="sort-chip active" data-action="setLogSort" data-id="time-desc">時間新→舊</button>
     <button type="button" class="sort-chip" data-action="setLogSort" data-id="amount-desc">金額高→低</button>
@@ -334,8 +335,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 
     <div class="section-label">進貨日期</div>
     <div class="date-picker-row">
-      <input type="date" id="stockDateInput" data-action-input="stockDate">
-      <input type="time" id="stockTimeInput" data-action-input="stockTime">
+      <input type="text" id="stockDateInput" placeholder="YYYY-MM-DD" maxlength="10" inputmode="numeric" autocomplete="off" data-action-input="stockDate">
+      <input type="text" id="stockTimeInput" placeholder="HH:MM" maxlength="5" inputmode="numeric" autocomplete="off" data-action-input="stockTime">
       <button type="button" class="today-btn" data-action="stockDateNow">現在</button>
     </div>
 
@@ -571,6 +572,7 @@ const ALL_CHANNELS = [
   { id: 'consign-sg', name: '時光造所', archived: false },
   { id: 'consign-by', name: '邊緣工事', archived: false },
   { id: 'consign-jg', name: '集光市', archived: false },
+  { id: 'media', name: '雜誌', archived: false },
 ];
 
 // 讀取歸檔狀態
@@ -621,6 +623,8 @@ let customProducts = loadData('customProducts', []);
 let PRODUCTS = [...HARDCODED_PRODUCTS, ...customProducts];
 
 let inventory = loadData('inventory', {});
+const HISTORICAL_SALES_DATA = [{"id":1700000000000,"date":"2025-12-13","time":"12:00","channelId":"market","channelName":"市集","productId":"rq-flat","productName":"紅茄扁包","qty":1,"amount":390},{"id":1700000000001,"date":"2025-12-13","time":"12:00","channelId":"market","channelName":"市集","productId":"rq-tote","productName":"紅茄托特包","qty":1,"amount":495},{"id":1700000000002,"date":"2025-12-14","time":"12:00","channelId":"market","channelName":"市集","productId":"bk-sm","productName":"棕葵小包","qty":1,"amount":390},{"id":1700000000003,"date":"2025-12-14","time":"12:00","channelId":"market","channelName":"市集","productId":"gk-sm","productName":"綠葵小包","qty":1,"amount":1600},{"id":1700000000004,"date":"2025-12-14","time":"12:00","channelId":"market","channelName":"市集","productId":"gk-tote","productName":"綠葵托特包","qty":1,"amount":550},{"id":1700000000005,"date":"2025-12-14","time":"12:00","channelId":"market","channelName":"市集","productId":"gk-flat","productName":"綠葵扁包","qty":1,"amount":390},{"id":1700000000006,"date":"2025-12-14","time":"12:00","channelId":"market","channelName":"市集","productId":"bk-cos","productName":"棕葵化妝包","qty":1,"amount":490},{"id":1700000000007,"date":"2025-12-17","time":"12:00","channelId":"website","channelName":"官網","productId":"lq-sm","productName":"綠茄小包","qty":2,"amount":652},{"id":1700000000008,"date":"2025-12-22","time":"12:00","channelId":"website","channelName":"官網","productId":"gk-tote","productName":"綠葵托特包","qty":1,"amount":500},{"id":1700000000009,"date":"2026-01-07","time":"12:00","channelId":"consign-jg","channelName":"集光市","productId":"gk-hair","productName":"綠葵髮圈","qty":1,"amount":70},{"id":1700000000010,"date":"2026-01-07","time":"12:00","channelId":"consign-jg","channelName":"集光市","productId":"bk-hair","productName":"棕葵髮圈","qty":1,"amount":70},{"id":1700000000011,"date":"2026-01-07","time":"12:00","channelId":"consign-jg","channelName":"集光市","productId":"lq-hair","productName":"綠茄髮圈","qty":1,"amount":70},{"id":1700000000012,"date":"2026-01-24","time":"12:00","channelId":"market","channelName":"市集","productId":"bk-hair","productName":"棕葵髮圈","qty":1,"amount":100},{"id":1700000000013,"date":"2026-01-24","time":"12:00","channelId":"market","channelName":"市集","productId":"ab-cos","productName":"古董藍化妝包","qty":1,"amount":460},{"id":1700000000014,"date":"2026-01-24","time":"12:00","channelId":"market","channelName":"市集","productId":"gk-cos","productName":"綠葵化妝包","qty":1,"amount":490},{"id":1700000000015,"date":"2026-01-25","time":"12:00","channelId":"market","channelName":"市集","productId":"gk-sm","productName":"綠葵小包","qty":1,"amount":370},{"id":1700000000016,"date":"2026-01-25","time":"12:00","channelId":"market","channelName":"市集","productId":"bk-sm","productName":"棕葵小包","qty":1,"amount":370},{"id":1700000000017,"date":"2026-01-25","time":"12:00","channelId":"market","channelName":"市集","productId":"ab-flat","productName":"古董藍扁包","qty":1,"amount":260},{"id":1700000000018,"date":"2026-01-25","time":"12:00","channelId":"market","channelName":"市集","productId":"lq-sm","productName":"綠茄小包","qty":1,"amount":390},{"id":1700000000019,"date":"2026-01-25","time":"12:00","channelId":"market","channelName":"市集","productId":"rq-cos","productName":"紅茄化妝包","qty":1,"amount":490},{"id":1700000000020,"date":"2026-01-25","time":"12:00","channelId":"market","channelName":"市集","productId":"ab-flat","productName":"古董藍扁包","qty":1,"amount":150},{"id":1700000000021,"date":"2026-01-25","time":"12:00","channelId":"market","channelName":"市集","productId":"bm-flat","productName":"藍米帆布扁包","qty":1,"amount":390},{"id":1700000000022,"date":"2026-01-25","time":"12:00","channelId":"market","channelName":"市集","productId":"rq-flat","productName":"紅茄扁包","qty":1,"amount":390},{"id":1700000000023,"date":"2026-01-25","time":"12:00","channelId":"market","channelName":"市集","productId":"bk-flat","productName":"棕葵扁包","qty":1,"amount":390},{"id":1700000000024,"date":"2026-01-25","time":"12:00","channelId":"market","channelName":"市集","productId":"gk-hair","productName":"綠葵髮圈","qty":1,"amount":100},{"id":1700000000025,"date":"2026-01-25","time":"12:00","channelId":"market","channelName":"市集","productId":"wh-hair","productName":"白色楊柳紗髮圈","qty":1,"amount":80},{"id":1700000000026,"date":"2026-02-13","time":"12:00","channelId":"media","channelName":"雜誌","productId":"bk-sm","productName":"棕葵小包","qty":1,"amount":390},{"id":1700000000027,"date":"2026-02-13","time":"12:00","channelId":"media","channelName":"雜誌","productId":"rq-hair","productName":"紅茄髮圈","qty":1,"amount":100},{"id":1700000000028,"date":"2026-02-13","time":"12:00","channelId":"media","channelName":"雜誌","productId":"lq-hair","productName":"綠茄髮圈","qty":1,"amount":100},{"id":1700000000029,"date":"2026-02-13","time":"12:00","channelId":"media","channelName":"雜誌","productId":"gk-hair","productName":"綠葵髮圈","qty":1,"amount":100},{"id":1700000000030,"date":"2026-02-13","time":"12:00","channelId":"media","channelName":"雜誌","productId":"bk-hair","productName":"棕葵髮圈","qty":1,"amount":100},{"id":1700000000031,"date":"2026-02-23","time":"12:00","channelId":"consign-jg","channelName":"集光市","productId":"custom-髮圈（未顯示款式）","productName":"髮圈（未顯示款式）","qty":2,"amount":90},{"id":1700000000032,"date":"2026-02-26","time":"12:00","channelId":"consign-jg","channelName":"集光市","productId":"gk-tote","productName":"綠葵托特包","qty":1,"amount":495},{"id":1700000000033,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"gk-cos","productName":"綠葵化妝包","qty":1,"amount":864},{"id":1700000000034,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"gk-hair","productName":"綠葵髮圈","qty":1,"amount":100},{"id":1700000000035,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"bk-sm","productName":"棕葵小包","qty":1,"amount":390},{"id":1700000000036,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"bk-hair","productName":"棕葵髮圈","qty":1,"amount":100},{"id":1700000000037,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"rc-hair","productName":"紅格紋髮圈","qty":1,"amount":135},{"id":1700000000038,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"gk-hair","productName":"綠葵髮圈","qty":1,"amount":100},{"id":1700000000039,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"gk-sm","productName":"綠葵小包","qty":1,"amount":1130},{"id":1700000000040,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"ab-flat","productName":"古董藍扁包","qty":1,"amount":390},{"id":1700000000041,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"sb-tote","productName":"條紋棕托特包","qty":1,"amount":550},{"id":1700000000042,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"lb-hair","productName":"淺藍條紋髮圈","qty":1,"amount":170},{"id":1700000000043,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"gk-hair","productName":"綠葵髮圈","qty":1,"amount":100},{"id":1700000000044,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"bk-sm","productName":"棕葵小包","qty":1,"amount":700},{"id":1700000000045,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"bk-flat","productName":"棕葵扁包","qty":1,"amount":390},{"id":1700000000046,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"gk-sm","productName":"綠葵小包","qty":1,"amount":390},{"id":1700000000047,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"bk-hair","productName":"棕葵髮圈","qty":1,"amount":1201},{"id":1700000000048,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"gk-hair","productName":"綠葵髮圈","qty":1,"amount":100},{"id":1700000000049,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"bk-sm","productName":"棕葵小包","qty":1,"amount":390},{"id":1700000000050,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"bk-flat","productName":"棕葵扁包","qty":1,"amount":390},{"id":1700000000051,"date":"2026-02-28","time":"12:00","channelId":"market","channelName":"市集","productId":"bk-cos","productName":"棕葵化妝包","qty":1,"amount":490},{"id":1700000000052,"date":"2026-02-28","time":"12:00","channelId":"consign-jg","channelName":"集光市","productId":"rq-hair","productName":"紅茄髮圈","qty":1,"amount":90},{"id":1700000000053,"date":"2026-03-01","time":"12:00","channelId":"market","channelName":"市集","productId":"rq-hair","productName":"紅茄髮圈","qty":1,"amount":400},{"id":1700000000054,"date":"2026-03-01","time":"12:00","channelId":"market","channelName":"市集","productId":"lq-hair","productName":"綠茄髮圈","qty":1,"amount":100},{"id":1700000000055,"date":"2026-03-01","time":"12:00","channelId":"market","channelName":"市集","productId":"bk-hair","productName":"棕葵髮圈","qty":1,"amount":100},{"id":1700000000056,"date":"2026-03-01","time":"12:00","channelId":"market","channelName":"市集","productId":"hz-hair","productName":"人字紋髮圈","qty":1,"amount":100},{"id":1700000000057,"date":"2026-03-01","time":"12:00","channelId":"market","channelName":"市集","productId":"lb-hair","productName":"淺藍條紋髮圈","qty":1,"amount":100},{"id":1700000000058,"date":"2026-03-08","time":"12:00","channelId":"consign-jg","channelName":"集光市","productId":"rd-sock","productName":"圓點波浪紅襪","qty":1,"amount":270},{"id":1700000000059,"date":"2026-03-09","time":"12:00","channelId":"website","channelName":"官網","productId":"ab-cos","productName":"古董藍化妝包","qty":1,"amount":953},{"id":1700000000060,"date":"2026-03-09","time":"12:00","channelId":"website","channelName":"官網","productId":"ab-flat","productName":"古董藍扁包","qty":1,"amount":390},{"id":1700000000061,"date":"2026-03-09","time":"12:00","channelId":"website","channelName":"官網","productId":"ab-sm","productName":"古董藍小包","qty":1,"amount":390},{"id":1700000000062,"date":"2026-03-22","time":"12:00","channelId":"pinkoi","channelName":"Pinkoi","productId":"rq-hair","productName":"紅茄髮圈","qty":1,"amount":125}];
+
 let salesLog = loadData('salesLog', []);
 let moveLog = loadData('moveLog', []);
 
@@ -1265,8 +1269,9 @@ function confirmSell() {
   const discount = parseInt(document.getElementById('discountInput').value) || 0;
   const amount = (product.price * qty) - discount;
 
-  // 使用日期選擇器的值（預設今天），避免 toISOString 的 UTC 時差問題
-  const sellDate = document.getElementById('sellDateInput').value || formatLocalDate(new Date());
+  // 使用手動輸入的日期（預設今天），驗證格式 YYYY-MM-DD
+  const rawSellDate = document.getElementById('sellDateInput').value;
+  const sellDate = /^\d{4}-\d{2}-\d{2}$/.test(rawSellDate) ? rawSellDate : formatLocalDate(new Date());
   const sale = {
     date: sellDate,
     time: new Date().toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' }),
@@ -1544,8 +1549,10 @@ function confirmStockIn() {
   const { stockProduct, stockQty } = state;
   if (!stockProduct) return;
 
-  const stockDate = document.getElementById('stockDateInput').value || formatLocalDate(new Date());
-  const stockTime = document.getElementById('stockTimeInput').value || new Date().toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' });
+  const rawStockDate = document.getElementById('stockDateInput').value;
+  const stockDate = /^\d{4}-\d{2}-\d{2}$/.test(rawStockDate) ? rawStockDate : formatLocalDate(new Date());
+  const rawStockTime = document.getElementById('stockTimeInput').value;
+  const stockTime = /^\d{2}:\d{2}$/.test(rawStockTime) ? rawStockTime : new Date().toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' });
 
   const product = PRODUCTS.find(p => p.id === stockProduct);
   const move = {
@@ -1619,8 +1626,8 @@ function exportAllSalesCSV() {
 
 function exportInventoryCSV() {
   const today = new Date().toISOString().slice(0, 10);
-  const locIds = ['home', 'market', 'website', 'pinkoi', 'consign-sg', 'consign-by', 'consign-jg'];
-  const locNames = { home: '家（總倉）', market: '市集', website: '官網', pinkoi: 'Pinkoi', 'consign-sg': '時光造所', 'consign-by': '邊緣工事', 'consign-jg': '集光市' };
+  const locIds = ['home', 'market', 'website', 'pinkoi', 'consign-sg', 'consign-by', 'consign-jg', 'media'];
+  const locNames = { home: '家（總倉）', market: '市集', website: '官網', pinkoi: 'Pinkoi', 'consign-sg': '時光造所', 'consign-by': '邊緣工事', 'consign-jg': '集光市', media: '雜誌' };
 
   let csv = '商品名稱,單價,系列,' + locIds.map(id => locNames[id]).join(',') + ',總庫存\n';
   PRODUCTS.forEach(p => {
@@ -1823,16 +1830,35 @@ renderProducts();
 renderSellBtn();
 initializeSync();
 
-// iOS Safari date/time 反白修正
-document.querySelectorAll('input[type="date"], input[type="time"]').forEach(el => {
-  function fixColor() { el.style.color = '#111C31'; el.style.webkitTextFillColor = '#111C31'; }
-  el.addEventListener('focus', fixColor);
-  el.addEventListener('change', fixColor);
-  el.addEventListener('blur', fixColor);
-  el.addEventListener('input', fixColor);
-  el.addEventListener('touchend', fixColor);
-  fixColor();
-});
+// 日期手動輸入自動格式化（輸入數字自動補 - 或 :）
+function autoFormatDate(el) {
+  el.addEventListener('input', function(e) {
+    let v = this.value.replace(/[^\d]/g, '');
+    if (v.length > 4) v = v.slice(0,4) + '-' + v.slice(4);
+    if (v.length > 7) v = v.slice(0,7) + '-' + v.slice(7);
+    this.value = v.slice(0, 10);
+  });
+}
+function autoFormatTime(el) {
+  el.addEventListener('input', function(e) {
+    let v = this.value.replace(/[^\d]/g, '');
+    if (v.length > 2) v = v.slice(0,2) + ':' + v.slice(2);
+    this.value = v.slice(0, 5);
+  });
+}
+autoFormatDate(document.getElementById('sellDateInput'));
+autoFormatDate(document.getElementById('stockDateInput'));
+autoFormatTime(document.getElementById('stockTimeInput'));
+
+function importHistoricalData() {
+  if (!confirm('確定要清除現有銷售紀錄，並匯入試算表歷史資料（共63筆）嗎？')) return;
+  salesLog = [...HISTORICAL_SALES_DATA];
+  saveData('salesLog', salesLog);
+  state.selectedDate = formatLocalDate(new Date());
+  renderLog();
+  renderAnalysis();
+  showToast('✓ 已匯入歷史資料（63筆）');
+}
 </script>
 </body>
 </html>
