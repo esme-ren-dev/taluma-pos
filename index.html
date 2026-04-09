@@ -571,8 +571,8 @@ const ALL_CHANNELS = [
   { id: 'pinkoi', name: 'Pinkoi', archived: false },
   { id: 'consign-sg', name: '時光造所', archived: false },
   { id: 'consign-by', name: '邊緣工事', archived: false },
-  { id: 'consign-jg', name: '集光市', archived: false },
-  { id: 'media', name: '雜誌', archived: false },
+  { id: 'consign-jg', name: '集光市', archived: true },
+  { id: 'eslite-young', name: '誠品肖年頭家', archived: false },
 ];
 
 // 讀取歸檔狀態
@@ -1626,8 +1626,8 @@ function exportAllSalesCSV() {
 
 function exportInventoryCSV() {
   const today = new Date().toISOString().slice(0, 10);
-  const locIds = ['home', 'market', 'website', 'pinkoi', 'consign-sg', 'consign-by', 'consign-jg', 'media'];
-  const locNames = { home: '家（總倉）', market: '市集', website: '官網', pinkoi: 'Pinkoi', 'consign-sg': '時光造所', 'consign-by': '邊緣工事', 'consign-jg': '集光市', media: '雜誌' };
+  const locIds = ALL_LOCATIONS.map(l => l.id);
+  const locNames = Object.fromEntries(ALL_LOCATIONS.map(l => [l.id, l.name]));
 
   let csv = '商品名稱,單價,系列,' + locIds.map(id => locNames[id]).join(',') + ',總庫存\n';
   PRODUCTS.forEach(p => {
