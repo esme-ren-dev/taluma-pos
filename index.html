@@ -186,6 +186,28 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 .edit-sheet .btn-row { display: flex; gap: 8px; margin-top: 16px; }
 .edit-sheet .cancel { flex: 1; padding: 12px; background: #eee; color: #666; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
 .edit-sheet .ok { flex: 1; padding: 12px; background: #21409a; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; }
+/* === COUNT (盤點) PAGE === */
+.count-row { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: white; border-radius: 8px; margin-bottom: 6px; border: 1px solid #e8e0d5; }
+.count-row .name { flex: 1; font-size: 13px; color: #111C31; }
+.count-row .current { font-size: 11px; color: #888; min-width: 50px; text-align: center; }
+.count-row input { width: 64px; text-align: center; border: 1px solid #D0D0D0; border-radius: 8px; padding: 8px 4px; font-size: 16px; font-weight: bold; color: #111C31; -moz-appearance: textfield; }
+.count-row input::-webkit-outer-spin-button, .count-row input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.count-row input:focus { border-color: #21409a; outline: none; }
+.count-row input.changed { border-color: #21409a; background: #eff5ff; }
+
+/* === CART === */
+.cart-section { background: #111C31; border-radius: 8px; padding: 12px; margin-top: 12px; }
+.cart-section h4 { color: #F9EBD7; font-size: 13px; margin-bottom: 8px; }
+.cart-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #1a2540; font-size: 13px; color: #a0a8b8; }
+.cart-item:last-child { border-bottom: none; }
+.cart-item .cart-del { background: none; border: none; color: #AB1A1A; font-size: 16px; cursor: pointer; padding: 0 4px; }
+.cart-total { margin-top: 8px; padding-top: 8px; border-top: 1px solid #21409a; text-align: right; }
+.cart-total .amount { font-size: 20px; color: #F9EBD7; font-weight: bold; }
+.cart-empty { color: #666; font-size: 12px; text-align: center; padding: 8px; }
+.add-cart-btn { width: 100%; padding: 12px; border-radius: 12px; border: 2px dashed #21409a; background: transparent; color: #21409a; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 12px; letter-spacing: 1px; }
+.add-cart-btn:disabled { border-color: #D0D0D0; color: #999; }
+.add-cart-btn:active:not(:disabled) { background: #eff5ff; }
+
 .log-item .edit-btn { color: #21409a; font-size: 14px; padding: 0 4px; cursor: pointer; margin-left: 4px; background: none; border: none; }
 .inv-card .edit-inv-btn { color: #21409a; font-size: 12px; padding: 2px 8px; cursor: pointer; background: none; border: 1px solid #21409a; border-radius: 12px; margin-left: 8px; }
 
@@ -220,6 +242,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
   <button type="button" class="tab" data-action="switchTab" data-id="inventory">庫存</button>
   <button type="button" class="tab" data-action="switchTab" data-id="log">銷售紀錄</button>
   <button type="button" class="tab" data-action="switchTab" data-id="move">調貨</button>
+  <button type="button" class="tab" data-action="switchTab" data-id="count">盤點</button>
   <button type="button" class="tab" data-action="switchTab" data-id="analysis">分析</button>
 </div>
 
@@ -245,16 +268,27 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
   </div>
 
   <div class="discount-row">
-    <label>讓利金額</label>
-    <input type="number" id="discountInput" placeholder="0" value="0">
+    <label>讓利 %</label>
+    <input type="number" id="discountInput" placeholder="0" value="0" min="0" max="100" step="1">
   </div>
 
   <div class="sale-summary">
-    <div>實收金額</div>
+    <div>此品項金額</div>
     <div class="amount" id="saleAmount">$0</div>
   </div>
 
-  <button type="button" class="sell-btn" id="sellBtn" disabled data-action="confirmSell">選擇商品</button>
+  <button type="button" class="add-cart-btn" id="addCartBtn" disabled data-action="addToCart">＋ 加入訂單</button>
+
+  <div class="cart-section" id="cartSection" style="display:none;">
+    <h4>🛒 本筆訂單</h4>
+    <div id="cartItems"></div>
+    <div class="cart-total">
+      <div style="font-size:12px;color:#a0a8b8;">訂單總額</div>
+      <div class="amount" id="cartTotal">$0</div>
+    </div>
+  </div>
+
+  <button type="button" class="sell-btn" id="sellBtn" disabled data-action="confirmSell">結帳 ✓</button>
 </div>
 
 <!-- INVENTORY PAGE -->
@@ -360,6 +394,33 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 </div>
 
 <!-- ANALYSIS PAGE -->
+<!-- COUNT (盤點) PAGE -->
+<div id="page-count" class="page">
+  <div style="background:#eff5ff;border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px;color:#21409a;line-height:1.6;">
+    選擇地點後，一次輸入所有商品的實際庫存數量。按「儲存盤點」覆寫該地點的庫存。
+  </div>
+
+  <div class="section-label">盤點地點</div>
+  <div class="channel-grid" id="countLocGrid"></div>
+
+  <div id="countFormContainer" style="display:none;margin-top:16px;">
+    <div class="section-label">輸入庫存數量</div>
+    <div id="countProductList"></div>
+
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button type="button" class="sell-btn" style="flex:1;background:#21409a;" data-action="saveCount">儲存盤點</button>
+      <button type="button" class="export-btn" style="flex:0 0 auto;margin:0;padding:14px 16px;" data-action="exportCountCSV">匯出 CSV</button>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:24px;">資料備份</div>
+  <div style="display:flex;gap:8px;">
+    <button type="button" class="export-btn" style="flex:1;margin:0;" data-action="exportAllData">匯出全部資料 (JSON)</button>
+    <button type="button" class="export-btn" style="flex:1;margin:0;" data-action="importAllData">匯入資料 (JSON)</button>
+  </div>
+  <input type="file" id="importFileInput" accept=".json" style="display:none;">
+</div>
+
 <div id="page-analysis" class="page">
   <!-- Overview Section -->
   <div class="analysis-section">
@@ -370,7 +431,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
         <div class="value" id="analysisTotalRevenue">$0</div>
       </div>
       <div class="overview-card">
-        <div class="label">總交易筆數</div>
+        <div class="label">總訂單數</div>
         <div class="value" id="analysisTotalTransactions">0</div>
       </div>
       <div class="overview-card">
@@ -491,8 +552,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
       <input type="number" id="editSaleQty" min="1">
     </div>
     <div class="form-row">
-      <label>折扣金額</label>
-      <input type="number" id="editSaleDiscount" min="0" value="0">
+      <label>讓利 %</label>
+      <input type="number" id="editSaleDiscount" min="0" max="100" step="1" value="0">
     </div>
     <div class="btn-row">
       <button type="button" class="cancel" data-action="closeEditSaleModal">取消</button>
@@ -529,30 +590,30 @@ const PRODUCT_TYPES = ['髮圈', '小包', '扁包', '托特包', '化妝包', '
 const HARDCODED_PRODUCTS = [
   // 尋草蒔歲 2026SS — 綠葵
   { id: 'gk-tote', name: '綠葵托特包', price: 550, series: '綠葵', type: '托特包', season: '2026SS' },
-  { id: 'gk-cos', name: '綠葵化妝包', price: 490, series: '綠葵', type: '化妝包', season: '2026SS' },
+  { id: 'gk-cos', name: '綠葵化妝包', price: 590, series: '綠葵', type: '化妝包', season: '2026SS' },
   { id: 'gk-flat', name: '綠葵扁包', price: 390, series: '綠葵', type: '扁包', season: '2026SS' },
   { id: 'gk-sm', name: '綠葵小包', price: 390, series: '綠葵', type: '小包', season: '2026SS' },
   { id: 'gk-hair', name: '綠葵髮圈', price: 100, series: '綠葵', type: '髮圈', season: '2026SS' },
   // 尋草蒔歲 2026SS — 棕葵
   { id: 'bk-tote', name: '棕葵托特包', price: 550, series: '棕葵', type: '托特包', season: '2026SS' },
-  { id: 'bk-cos', name: '棕葵化妝包', price: 490, series: '棕葵', type: '化妝包', season: '2026SS' },
+  { id: 'bk-cos', name: '棕葵化妝包', price: 590, series: '棕葵', type: '化妝包', season: '2026SS' },
   { id: 'bk-flat', name: '棕葵扁包', price: 390, series: '棕葵', type: '扁包', season: '2026SS' },
   { id: 'bk-sm', name: '棕葵小包', price: 390, series: '棕葵', type: '小包', season: '2026SS' },
   { id: 'bk-hair', name: '棕葵髮圈', price: 100, series: '棕葵', type: '髮圈', season: '2026SS' },
   // 尋草蒔歲 2026SS — 紅茄
   { id: 'rq-tote', name: '紅茄托特包', price: 550, series: '紅茄', type: '托特包', season: '2026SS' },
-  { id: 'rq-cos', name: '紅茄化妝包', price: 490, series: '紅茄', type: '化妝包', season: '2026SS' },
+  { id: 'rq-cos', name: '紅茄化妝包', price: 590, series: '紅茄', type: '化妝包', season: '2026SS' },
   { id: 'rq-flat', name: '紅茄扁包', price: 390, series: '紅茄', type: '扁包', season: '2026SS' },
   { id: 'rq-sm', name: '紅茄小包', price: 390, series: '紅茄', type: '小包', season: '2026SS' },
   { id: 'rq-hair', name: '紅茄髮圈', price: 100, series: '紅茄', type: '髮圈', season: '2026SS' },
   // 尋草蒔歲 2026SS — 綠茄
   { id: 'lq-tote', name: '綠茄托特包', price: 550, series: '綠茄', type: '托特包', season: '2026SS' },
-  { id: 'lq-cos', name: '綠茄化妝包', price: 490, series: '綠茄', type: '化妝包', season: '2026SS' },
+  { id: 'lq-cos', name: '綠茄化妝包', price: 590, series: '綠茄', type: '化妝包', season: '2026SS' },
   { id: 'lq-flat', name: '綠茄扁包', price: 390, series: '綠茄', type: '扁包', season: '2026SS' },
   { id: 'lq-sm', name: '綠茄小包', price: 390, series: '綠茄', type: '小包', season: '2026SS' },
   { id: 'lq-hair', name: '綠茄髮圈', price: 100, series: '綠茄', type: '髮圈', season: '2026SS' },
   // 老布重生 — 古董藍
-  { id: 'ab-cos', name: '古董藍化妝包', price: 490, series: '古董藍', type: '化妝包', season: 'vintage' },
+  { id: 'ab-cos', name: '古董藍化妝包', price: 590, series: '古董藍', type: '化妝包', season: 'vintage' },
   { id: 'ab-flat', name: '古董藍扁包', price: 390, series: '古董藍', type: '扁包', season: 'vintage' },
   { id: 'ab-sm', name: '古董藍小包', price: 390, series: '古董藍', type: '小包', season: 'vintage' },
   // 嚴選布花
@@ -618,6 +679,9 @@ function loadData(key, fallback) {
   catch { return fallback; }
 }
 function saveData(key, val) { localStorage.setItem('taluma_' + key, JSON.stringify(val)); }
+
+let cart = []; // { channelId, channelName, productId, productName, qty, unitPrice, discountPct, amount }
+let orderCounter = loadData('orderCounter', 0);
 
 let customProducts = loadData('customProducts', []);
 let PRODUCTS = [...HARDCODED_PRODUCTS, ...customProducts];
@@ -835,20 +899,90 @@ function renderProducts() {
 }
 
 function renderSellBtn() {
-  const btn = document.getElementById('sellBtn');
+  const sellBtn = document.getElementById('sellBtn');
+  const addBtn = document.getElementById('addCartBtn');
   const { selectedChannel, selectedProduct, qty } = state;
+
+  // 加入訂單按鈕
   if (selectedChannel && selectedProduct) {
     const p = PRODUCTS.find(x => x.id === selectedProduct);
-    const discount = parseInt(document.getElementById('discountInput').value) || 0;
-    const amount = (p.price * qty) - discount;
+    const discountPct = parseFloat(document.getElementById('discountInput').value) || 0;
+    const amount = Math.round((p.price * qty) * (1 - discountPct / 100));
     document.getElementById('saleAmount').textContent = `$${amount}`;
-    btn.textContent = `賣出 ✓`;
-    btn.disabled = false;
+    addBtn.textContent = '＋ 加入訂單';
+    addBtn.disabled = false;
   } else {
     document.getElementById('saleAmount').textContent = '$0';
-    btn.textContent = '尚未選擇通路和商品';
-    btn.disabled = true;
+    addBtn.textContent = '請先選擇通路和商品';
+    addBtn.disabled = true;
   }
+
+  // 結帳按鈕 & 購物車
+  renderCart();
+}
+
+function renderCart() {
+  const sellBtn = document.getElementById('sellBtn');
+  const cartSection = document.getElementById('cartSection');
+  const cartItemsEl = document.getElementById('cartItems');
+
+  if (cart.length === 0) {
+    cartSection.style.display = 'none';
+    sellBtn.textContent = '尚無品項';
+    sellBtn.disabled = true;
+    return;
+  }
+
+  cartSection.style.display = 'block';
+  const cartTotal = cart.reduce((sum, c) => sum + c.amount, 0);
+
+  cartItemsEl.innerHTML = cart.map((item, i) => `
+    <div class="cart-item">
+      <div>${item.productName} × ${item.qty}${item.discountPct > 0 ? ` <span style="color:#AB1A1A;font-size:11px;">(-${item.discountPct}%)</span>` : ''}</div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span>$${item.amount}</span>
+        <button type="button" class="cart-del" data-action="removeFromCart" data-id="${i}">×</button>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('cartTotal').textContent = `$${cartTotal.toLocaleString()}`;
+  sellBtn.textContent = `結帳（${cart.length} 項）✓`;
+  sellBtn.disabled = false;
+}
+
+function addToCart() {
+  const { selectedChannel, selectedProduct, qty } = state;
+  if (!selectedChannel || !selectedProduct) return;
+
+  const channel = CHANNELS.find(c => c.id === selectedChannel);
+  const product = PRODUCTS.find(p => p.id === selectedProduct);
+  const discountPct = parseFloat(document.getElementById('discountInput').value) || 0;
+  const amount = Math.round((product.price * qty) * (1 - discountPct / 100));
+
+  cart.push({
+    channelId: selectedChannel,
+    channelName: channel.name,
+    productId: selectedProduct,
+    productName: product.name,
+    qty: qty,
+    unitPrice: product.price,
+    discountPct: discountPct,
+    amount: amount
+  });
+
+  // 重置商品和數量（通路保留、讓利%保留）
+  state.selectedProduct = null;
+  state.qty = 1;
+  document.getElementById('qtyDisplay').value = '1';
+  renderProducts();
+  renderSellBtn();
+  showToast(`✓ ${product.name} 已加入訂單`);
+}
+
+function removeFromCart(idx) {
+  cart.splice(parseInt(idx), 1);
+  renderCart();
 }
 
 function renderInventory() {
@@ -926,7 +1060,7 @@ function renderLog() {
 
   document.getElementById('todaySummary').innerHTML = `
     <div class="total">$${totalAmount.toLocaleString()}</div>
-    <div class="count">${formatDate(selectedDate)} · ${selectedSales.length} 筆交易，共 ${totalItems} 件商品</div>
+    <div class="count">${formatDate(selectedDate)} · ${getOrderCount(selectedSales)} 筆訂單，共 ${totalItems} 件商品</div>
   `;
 
   document.querySelectorAll('#page-log .sort-chip').forEach(c => {
@@ -951,9 +1085,10 @@ function renderLog() {
 
   const list = document.getElementById('logList');
   list.innerHTML = logItems.map(s => {
+    const orderTag = s.orderId ? `<span style="font-size:10px;color:#21409a;background:#eff5ff;padding:1px 6px;border-radius:8px;margin-left:4px;">${s.orderId.slice(-8)}</span>` : '';
     return `<div class="log-item">
       <div class="left">
-        <div>${s.productName} × ${s.qty}</div>
+        <div>${s.productName} × ${s.qty}${orderTag}</div>
         <div><span class="channel-tag">${s.channelName}</span> <span class="time">${s.time}</span></div>
       </div>
       <div style="display:flex;align-items:center;">
@@ -965,14 +1100,25 @@ function renderLog() {
   }).join('') || '<div style="text-align:center;color:#666;padding:40px;">該日期無紀錄</div>';
 }
 
+function getOrderCount(sales) {
+  // 有 orderId 的用 orderId 分組；沒有的（舊資料）每筆算一個獨立訂單
+  const orderIds = new Set();
+  let noOrderCount = 0;
+  sales.forEach(s => {
+    if (s.orderId) orderIds.add(s.orderId);
+    else noOrderCount++;
+  });
+  return orderIds.size + noOrderCount;
+}
+
 function renderAnalysis() {
   const totalRevenue = salesLog.reduce((sum, s) => sum + s.amount, 0);
-  const totalTransactions = salesLog.length;
+  const totalOrders = getOrderCount(salesLog);
   const totalItems = salesLog.reduce((sum, s) => sum + s.qty, 0);
-  const avgValue = totalTransactions > 0 ? Math.floor(totalRevenue / totalTransactions) : 0;
+  const avgValue = totalOrders > 0 ? Math.floor(totalRevenue / totalOrders) : 0;
 
   document.getElementById('analysisTotalRevenue').textContent = `$${totalRevenue.toLocaleString()}`;
-  document.getElementById('analysisTotalTransactions').textContent = totalTransactions;
+  document.getElementById('analysisTotalTransactions').textContent = totalOrders;
   document.getElementById('analysisTotalItems').textContent = totalItems;
   document.getElementById('analysisAvgValue').textContent = `$${avgValue.toLocaleString()}`;
 
@@ -1140,10 +1286,16 @@ function renderMoveProducts() {
 
 function renderMoveBtn() {
   const btn = document.getElementById('moveBtn');
-  const { moveFrom, moveTo, moveProduct } = state;
+  const { moveFrom, moveTo, moveProduct, moveQty } = state;
   if (moveFrom && moveTo && moveProduct && moveFrom !== moveTo) {
-    btn.textContent = '調貨 ✓';
-    btn.disabled = false;
+    const available = inventory[moveFrom]?.[moveProduct] || 0;
+    if (available < (parseInt(moveQty) || 1)) {
+      btn.textContent = `庫存不足（剩 ${available}）`;
+      btn.disabled = true;
+    } else {
+      btn.textContent = '調貨 ✓';
+      btn.disabled = false;
+    }
   } else {
     btn.textContent = moveFrom === moveTo && moveFrom ? '不能調到同地點' : '尚未選擇商品和地點';
     btn.disabled = true;
@@ -1217,7 +1369,7 @@ function changeQty(d) { state.qty = Math.max(1, (parseInt(state.qty) || 1) + d);
 function selectMoveFrom(id) { state.moveFrom = id; renderMoveLocations(); renderMoveProducts(); renderMoveBtn(); }
 function selectMoveTo(id) { state.moveTo = id; renderMoveLocations(); renderMoveBtn(); }
 function selectMoveProduct(id) { state.moveProduct = id; renderMoveProducts(); renderMoveBtn(); }
-function changeMoveQty(d) { state.moveQty = Math.max(1, (parseInt(state.moveQty) || 1) + d); document.getElementById('moveQtyDisplay').value = state.moveQty; }
+function changeMoveQty(d) { state.moveQty = Math.max(1, (parseInt(state.moveQty) || 1) + d); document.getElementById('moveQtyDisplay').value = state.moveQty; renderMoveBtn(); }
 
 function selectStockProduct(id) { state.stockProduct = id; renderStockProducts(); renderStockBtn(); }
 function changeStockQty(d) { state.stockQty = Math.max(1, (parseInt(state.stockQty) || 1) + d); document.getElementById('stockQtyDisplay').value = state.stockQty; }
@@ -1249,73 +1401,85 @@ function setMoveMode(mode) {
 
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach((t, i) => {
-    const tabs = ['sell', 'inventory', 'log', 'move', 'analysis'];
+    const tabs = ['sell', 'inventory', 'log', 'move', 'count', 'analysis'];
     t.classList.toggle('active', tabs[i] === tab);
   });
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + tab).classList.add('active');
   if (tab === 'inventory') renderInventory();
   if (tab === 'log') renderLog();
+  if (tab === 'count') renderCountPage();
   if (tab === 'analysis') { renderAnalysis(); renderChannelArchive(); }
   if (tab === 'move') { setMoveMode('move'); renderSeriesFilter('moveSeriesFilter', 'moveSeries'); renderMoveLocations(); renderMoveProducts(); renderMoveBtn(); renderSeriesFilter('stockSeriesFilter', 'stockSeries'); renderStockProducts(); renderStockBtn(); renderMoveLog(); }
 }
 
 function confirmSell() {
-  const { selectedChannel, selectedProduct, qty } = state;
-  if (!selectedChannel || !selectedProduct) return;
-
-  const channel = CHANNELS.find(c => c.id === selectedChannel);
-  const product = PRODUCTS.find(p => p.id === selectedProduct);
-  const discount = parseInt(document.getElementById('discountInput').value) || 0;
-  const amount = (product.price * qty) - discount;
+  if (cart.length === 0) return;
 
   // 使用手動輸入的日期（預設今天），驗證格式 YYYY-MM-DD
   const rawSellDate = document.getElementById('sellDateInput').value;
   const sellDate = /^\d{4}-\d{2}-\d{2}$/.test(rawSellDate) ? rawSellDate : formatLocalDate(new Date());
-  const sale = {
-    date: sellDate,
-    time: new Date().toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' }),
-    channelId: selectedChannel,
-    channelName: channel.name,
-    productId: selectedProduct,
-    productName: product.name,
-    qty: qty,
-    amount: amount
-  };
+  const now = new Date().toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' });
 
-  // 樂觀更新：先更新本地
-  salesLog.push(sale);
+  // 產生訂單編號
+  orderCounter++;
+  saveData('orderCounter', orderCounter);
+  const orderId = `ORD-${sellDate.replace(/-/g, '')}-${String(orderCounter).padStart(4, '0')}`;
+
+  const itemNames = [];
+
+  cart.forEach(item => {
+    const sale = {
+      date: sellDate,
+      time: now,
+      channelId: item.channelId,
+      channelName: item.channelName,
+      productId: item.productId,
+      productName: item.productName,
+      qty: item.qty,
+      amount: item.amount,
+      orderId: orderId
+    };
+
+    salesLog.push(sale);
+
+    // 更新庫存
+    if (!inventory[item.channelId]) inventory[item.channelId] = {};
+    inventory[item.channelId][item.productId] = (inventory[item.channelId][item.productId] || 0) - item.qty;
+
+    // 背景同步到 Sheets
+    if (APPS_SCRIPT_URL) {
+      syncToSheets('addSale', {
+        action: 'addSale',
+        date: sale.date,
+        time: sale.time,
+        channel: item.channelName,
+        product: item.productName,
+        qty: item.qty,
+        unitPrice: item.unitPrice,
+        discountPct: item.discountPct,
+        amount: item.amount,
+        orderId: orderId
+      });
+    }
+
+    itemNames.push(item.productName);
+  });
+
   saveData('salesLog', salesLog);
-
-  // 更新庫存
-  if (!inventory[selectedChannel]) inventory[selectedChannel] = {};
-  inventory[selectedChannel][selectedProduct] = (inventory[selectedChannel][selectedProduct] || 0) - qty;
   saveData('inventory', inventory);
 
-  // 背景同步到 Sheets
-  if (APPS_SCRIPT_URL) {
-    syncToSheets('addSale', {
-      action: 'addSale',
-      date: sale.date,
-      time: sale.time,
-      channel: channel.name,
-      product: product.name,
-      qty: qty,
-      unitPrice: product.price,
-      discount: discount,
-      amount: amount
-    });
-  }
-
-  // 重置狀態
+  // 清空購物車和重置狀態
+  cart = [];
   state.selectedChannel = null;
   state.selectedProduct = null;
   state.qty = 1;
   document.getElementById('discountInput').value = '0';
+  document.getElementById('qtyDisplay').value = '1';
   renderChannels();
   renderProducts();
   renderSellBtn();
-  showToast(`✓ ${product.name} 已賣出`);
+  showToast(`✓ ${itemNames.join('、')} 已賣出`);
 }
 
 function deleteSale(idx) {
@@ -1383,7 +1547,8 @@ function editSale(idx) {
   editSaleIdx = idx;
   document.getElementById('editSaleQty').value = sale.qty;
   const originalTotal = product ? product.price * sale.qty : sale.amount;
-  document.getElementById('editSaleDiscount').value = Math.max(0, originalTotal - sale.amount);
+  const pct = originalTotal > 0 ? Math.round((1 - sale.amount / originalTotal) * 100) : 0;
+  document.getElementById('editSaleDiscount').value = Math.max(0, pct);
   document.getElementById('editSaleModal').classList.add('show');
   document.getElementById('editSaleQty').focus();
 }
@@ -1398,7 +1563,7 @@ function saveEditSale() {
   const sale = salesLog[editSaleIdx];
   const product = PRODUCTS.find(p => p.id === sale.productId);
   const newQty = parseInt(document.getElementById('editSaleQty').value) || 1;
-  const discount = parseInt(document.getElementById('editSaleDiscount').value) || 0;
+  const discountPct = parseFloat(document.getElementById('editSaleDiscount').value) || 0;
   const price = product ? product.price : Math.round(sale.amount / sale.qty);
 
   // 恢復舊庫存
@@ -1407,7 +1572,7 @@ function saveEditSale() {
   }
   // 更新銷售紀錄
   sale.qty = newQty;
-  sale.amount = (price * newQty) - discount;
+  sale.amount = Math.round((price * newQty) * (1 - discountPct / 100));
   // 扣除新庫存
   if (inventory[sale.channelId]) {
     inventory[sale.channelId][sale.productId] = (inventory[sale.channelId][sale.productId] || 0) - newQty;
@@ -1422,6 +1587,130 @@ function saveEditSale() {
 }
 
 // ===== CHANNEL ARCHIVE =====
+// ===== COUNT (盤點) =====
+let countLocation = null;
+
+function renderCountPage() {
+  const grid = document.getElementById('countLocGrid');
+  grid.innerHTML = LOCATIONS.map(l =>
+    `<button type="button" class="channel-btn ${countLocation === l.id ? 'selected' : ''}" data-action="selectCountLoc" data-id="${l.id}">${l.name}</button>`
+  ).join('');
+
+  const container = document.getElementById('countFormContainer');
+  if (!countLocation) {
+    container.style.display = 'none';
+    return;
+  }
+  container.style.display = 'block';
+
+  const listEl = document.getElementById('countProductList');
+  listEl.innerHTML = PRODUCTS.map(p => {
+    const current = inventory[countLocation]?.[p.id] || 0;
+    return `<div class="count-row">
+      <div class="name">${p.name}</div>
+      <div class="current">現有 ${current}</div>
+      <input type="number" id="count-${p.id}" value="${current}" data-product="${p.id}" data-original="${current}"
+             oninput="this.classList.toggle('changed', this.value !== this.dataset.original)">
+    </div>`;
+  }).join('');
+}
+
+function selectCountLoc(id) {
+  countLocation = id;
+  renderCountPage();
+}
+
+function saveCount() {
+  if (!countLocation) return;
+  const loc = LOCATIONS.find(l => l.id === countLocation);
+  let changedCount = 0;
+
+  PRODUCTS.forEach(p => {
+    const input = document.getElementById('count-' + p.id);
+    if (!input) return;
+    const newVal = parseInt(input.value);
+    if (isNaN(newVal)) return;
+    const oldVal = inventory[countLocation]?.[p.id] || 0;
+    if (newVal !== oldVal) changedCount++;
+    if (!inventory[countLocation]) inventory[countLocation] = {};
+    inventory[countLocation][p.id] = newVal;
+  });
+
+  saveData('inventory', inventory);
+  renderCountPage();
+  renderInventory();
+  showToast(`✓ ${loc.name}盤點完成，更新了 ${changedCount} 項`);
+}
+
+function exportCountCSV() {
+  if (!countLocation) return;
+  const loc = LOCATIONS.find(l => l.id === countLocation);
+  let csv = '商品,庫存數量\n';
+  PRODUCTS.forEach(p => {
+    const qty = inventory[countLocation]?.[p.id] || 0;
+    csv += `${p.name},${qty}\n`;
+  });
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `TALUMA_盤點_${loc.name}_${formatLocalDate(new Date())}.csv`;
+  a.click();
+}
+
+function exportAllData() {
+  const data = {
+    exportDate: new Date().toISOString(),
+    inventory: inventory,
+    salesLog: salesLog,
+    moveLog: moveLog,
+    customProducts: customProducts,
+    orderCounter: orderCounter,
+    archivedChannels: loadData('archivedChannels', [])
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `TALUMA_備份_${formatLocalDate(new Date())}.json`;
+  a.click();
+  showToast('✓ 資料已匯出');
+}
+
+function importAllData() {
+  document.getElementById('importFileInput').click();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const fileInput = document.getElementById('importFileInput');
+  if (fileInput) {
+    fileInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (!data.inventory) { showToast('⚠ 格式錯誤：找不到庫存資料'); return; }
+          if (!confirm(`確定要匯入 ${data.exportDate ? data.exportDate.slice(0, 10) : '未知日期'} 的備份嗎？\n這會覆蓋現有的所有資料！`)) return;
+
+          if (data.inventory) { inventory = data.inventory; saveData('inventory', inventory); }
+          if (data.salesLog) { salesLog = data.salesLog; saveData('salesLog', salesLog); }
+          if (data.moveLog) { moveLog = data.moveLog; saveData('moveLog', moveLog); }
+          if (data.customProducts) { customProducts = data.customProducts; saveData('customProducts', customProducts); PRODUCTS = [...HARDCODED_PRODUCTS, ...customProducts]; }
+          if (data.orderCounter !== undefined) { orderCounter = data.orderCounter; saveData('orderCounter', orderCounter); }
+          if (data.archivedChannels) { saveData('archivedChannels', data.archivedChannels); }
+
+          showToast('✓ 資料匯入成功，頁面將重新載入');
+          setTimeout(() => location.reload(), 1500);
+        } catch (err) {
+          showToast('⚠ 檔案讀取失敗：' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+  }
+});
+
 function renderChannelArchive() {
   const list = document.getElementById('channelArchiveList');
   if (!list) return;
@@ -1461,18 +1750,28 @@ function confirmMove() {
   const { moveFrom, moveTo, moveProduct, moveQty } = state;
   if (!moveFrom || !moveTo || !moveProduct) return;
 
-  const fromLoc = LOCATIONS.find(l => l.id === moveFrom);
-  const toLoc = LOCATIONS.find(l => l.id === moveTo);
+  const fromLoc = ALL_LOCATIONS.find(l => l.id === moveFrom);
+  const toLoc = ALL_LOCATIONS.find(l => l.id === moveTo);
   const product = PRODUCTS.find(p => p.id === moveProduct);
+  const parsedMoveQty = parseInt(moveQty) || 1;
+
+  // 檢查來源庫存是否足夠
+  const currentStock = inventory[moveFrom]?.[moveProduct] || 0;
+  if (currentStock < parsedMoveQty) {
+    showToast(`⚠ ${fromLoc.name}的${product.name}只有 ${currentStock} 件，不夠調 ${parsedMoveQty} 件`);
+    return;
+  }
 
   const move = {
     date: formatLocalDate(new Date()),
     time: new Date().toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+    fromId: moveFrom,
+    toId: moveTo,
     from: fromLoc.name,
     to: toLoc.name,
     productId: moveProduct,
     productName: product.name,
-    qty: moveQty
+    qty: parsedMoveQty
   };
 
   // 樂觀更新
@@ -1480,7 +1779,8 @@ function confirmMove() {
   saveData('moveLog', moveLog);
 
   // 更新庫存
-  const parsedMoveQty = parseInt(moveQty) || 1;
+  if (!inventory[moveFrom]) inventory[moveFrom] = {};
+  if (!inventory[moveTo]) inventory[moveTo] = {};
   inventory[moveFrom][moveProduct] = (inventory[moveFrom][moveProduct] || 0) - parsedMoveQty;
   inventory[moveTo][moveProduct] = (inventory[moveTo][moveProduct] || 0) + parsedMoveQty;
   saveData('inventory', inventory);
@@ -1520,14 +1820,16 @@ function deleteMove(idx) {
     moveLog.splice(idx, 1);
     saveData('moveLog', moveLog);
 
-    // 恢復庫存
-    const fromId = LOCATIONS.find(l => l.name === move.from)?.id;
-    const toId = LOCATIONS.find(l => l.name === move.to)?.id;
-    if (fromId && toId) {
+    // 恢復庫存（優先用 fromId/toId，舊資料 fallback 用名稱查找）
+    const fromId = move.fromId || ALL_LOCATIONS.find(l => l.name === move.from)?.id;
+    const toId = move.toId || ALL_LOCATIONS.find(l => l.name === move.to)?.id;
+    if (fromId && inventory[fromId]) {
       inventory[fromId][move.productId] = (inventory[fromId][move.productId] || 0) + move.qty;
-      inventory[toId][move.productId] = (inventory[toId][move.productId] || 0) - move.qty;
-      saveData('inventory', inventory);
     }
+    if (toId && inventory[toId]) {
+      inventory[toId][move.productId] = (inventory[toId][move.productId] || 0) - move.qty;
+    }
+    saveData('inventory', inventory);
 
     // 背景同步
     if (APPS_SCRIPT_URL) {
@@ -1597,7 +1899,7 @@ function exportCSV() {
   const selectedDate = state.selectedDate;
   const selectedSales = salesLog.filter(s => s.date === selectedDate);
 
-  let csv = '日期,時間,通路,商品,數量,單價,讓利,總銷售額\n';
+  let csv = '日期,時間,通路,商品,數量,單價,讓利%,總銷售額\n';
   selectedSales.forEach(s => {
     const row = `${s.date},${s.time},${s.channelName},${s.productName},${s.qty},${PRODUCTS.find(p => p.id === s.productId)?.price || 0},0,${s.amount}`;
     csv += row + '\n';
@@ -1611,7 +1913,7 @@ function exportCSV() {
 }
 
 function exportAllSalesCSV() {
-  let csv = '日期,時間,通路,商品,數量,單價,讓利,總銷售額\n';
+  let csv = '日期,時間,通路,商品,數量,單價,讓利%,總銷售額\n';
   salesLog.forEach(s => {
     const row = `${s.date},${s.time},${s.channelName},${s.productName},${s.qty},${PRODUCTS.find(p => p.id === s.productId)?.price || 0},0,${s.amount}`;
     csv += row + '\n';
@@ -1772,7 +2074,7 @@ document.addEventListener('input', function(e) {
   if (!actionInput || actionInput === 'sellDate') return;
   const val = Math.max(1, parseInt(e.target.value) || 1);
   if (actionInput === 'sellQty') { state.qty = val; renderSellBtn(); }
-  else if (actionInput === 'moveQty') { state.moveQty = val; }
+  else if (actionInput === 'moveQty') { state.moveQty = val; renderMoveBtn(); }
   else if (actionInput === 'stockQty') { state.stockQty = val; }
 });
 document.addEventListener('blur', function(e) {
@@ -1781,13 +2083,13 @@ document.addEventListener('blur', function(e) {
   const val = Math.max(1, parseInt(e.target.value) || 1);
   e.target.value = val;
   if (actionInput === 'sellQty') { state.qty = val; renderSellBtn(); }
-  else if (actionInput === 'moveQty') { state.moveQty = val; }
+  else if (actionInput === 'moveQty') { state.moveQty = val; renderMoveBtn(); }
   else if (actionInput === 'stockQty') { state.stockQty = val; }
 }, true);
 
 // ===== EVENT DELEGATION =====
 const actions = {
-  selectChannel, selectProduct, confirmSell, exportCSV, exportAllSalesCSV, exportInventoryCSV,
+  selectChannel, selectProduct, addToCart, removeFromCart: (id) => removeFromCart(id), confirmSell, exportCSV, exportAllSalesCSV, exportInventoryCSV,
   selectMoveFrom, selectMoveTo, selectMoveProduct, confirmMove,
   selectStockProduct, confirmStockIn,
   changeStockQty: (id) => changeStockQty(parseInt(id)),
@@ -1805,6 +2107,9 @@ const actions = {
   closeEditInvModal, saveEditInv,
   editSale: (id) => editSale(parseInt(id)),
   closeEditSaleModal, saveEditSale,
+  // 盤點功能
+  selectCountLoc: (id) => selectCountLoc(id),
+  saveCount, exportCountCSV, exportAllData, importAllData,
   // 通路歸檔
   toggleArchive,
 };
