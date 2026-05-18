@@ -29,6 +29,9 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; backg
 /* === PAGES === */
 .page { display:none; padding:16px; padding-top:8px; }
 .page.active { display:block; }
+.page-back { display:flex; align-items:center; gap:6px; background:none; border:none; color:#007AFF; font-size:14px; padding:4px 0; margin-bottom:8px; }
+.page-back svg { width:18px; height:18px; }
+.page-back:active { opacity:0.6; }
 
 /* === CARDS === */
 .card { background:#fff; border-radius:12px; padding:14px 16px; margin-bottom:10px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
@@ -102,7 +105,10 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; backg
 .sheet { position:fixed; bottom:0; left:0; right:0; z-index:201; background:#fff; border-radius:16px 16px 0 0; max-height:92vh; overflow-y:auto; -webkit-overflow-scrolling:touch; transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.32,0.72,0,1); padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px)); }
 .sheet-overlay.show .sheet { transform:translateY(0); }
 .sheet .handle { width:36px; height:5px; border-radius:3px; background:#E5E5EA; margin:0 auto 16px; }
-.sheet h3 { font-size:17px; font-weight:600; margin-bottom:16px; }
+.sheet .sheet-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.sheet .sheet-header h3 { font-size:17px; font-weight:600; margin:0; }
+.sheet .sheet-close { width:30px; height:30px; border-radius:50%; background:#F2F2F7; border:none; display:flex; align-items:center; justify-content:center; color:#86868B; font-size:18px; flex-shrink:0; }
+.sheet .sheet-close:active { background:#E5E5EA; }
 
 /* === FORM ELEMENTS IN SHEETS === */
 .form-label { font-size:12px; font-weight:600; color:#86868B; margin:12px 0 6px; }
@@ -243,6 +249,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; backg
 
 <!-- PAGE: INVENTORY -->
 <div id="page-inv" class="page">
+  <button type="button" class="page-back" data-action="switchTab" data-id="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>首頁</button>
   <div class="search-box">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
     <input type="text" id="invSearch" placeholder="搜尋商品..." data-action-input="invSearch">
@@ -261,6 +268,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; backg
 
 <!-- PAGE: SALES -->
 <div id="page-sales" class="page">
+  <button type="button" class="page-back" data-action="switchTab" data-id="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>首頁</button>
   <div class="date-nav">
     <button type="button" data-action="prevDate">‹</button>
     <div class="current" id="currentDate"></div>
@@ -284,6 +292,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; backg
 
 <!-- PAGE: SETTINGS -->
 <div id="page-settings" class="page">
+  <button type="button" class="page-back" data-action="switchTab" data-id="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 19l-7-7 7-7"/></svg>首頁</button>
   <div class="setting-group">
     <div class="title">通路管理</div>
     <div id="channelArchiveList"></div>
@@ -332,7 +341,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; backg
 <div class="sheet-overlay" id="sellSheet">
   <div class="sheet">
     <div class="handle"></div>
-    <h3>回報銷售</h3>
+    <div class="sheet-header"><h3>回報銷售</h3><button type="button" class="sheet-close" data-action="closeSellSheet">✕</button></div>
     <div class="form-label">銷售日期</div>
     <div class="input-row">
       <input type="text" id="sellDateInput" placeholder="YYYY-MM-DD" maxlength="10" inputmode="numeric" style="flex:1;text-align:left;">
@@ -369,7 +378,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; backg
 <div class="sheet-overlay" id="moveSheet">
   <div class="sheet">
     <div class="handle"></div>
-    <h3>調貨 / 進貨</h3>
+    <div class="sheet-header"><h3>調貨 / 進貨</h3><button type="button" class="sheet-close" data-action="closeMoveSheet">✕</button></div>
     <div style="display:flex;gap:8px;margin-bottom:12px;">
       <button type="button" class="chip active" data-action="setMoveMode" data-id="move" id="moveModeMove">調貨</button>
       <button type="button" class="chip" data-action="setMoveMode" data-id="stock" id="moveModeStock">進貨到總倉</button>
@@ -418,7 +427,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; backg
 <div class="sheet-overlay" id="countSheet">
   <div class="sheet">
     <div class="handle"></div>
-    <h3>盤點校正</h3>
+    <div class="sheet-header"><h3>盤點校正</h3><button type="button" class="sheet-close" data-action="closeCountSheet">✕</button></div>
     <div style="background:#EBF5FF;border-radius:10px;padding:10px;margin-bottom:12px;font-size:13px;color:#007AFF;line-height:1.6;">選擇地點，輸入實際庫存數量後儲存。</div>
     <div class="form-label">盤點地點</div>
     <div class="btn-grid" id="countLocGrid"></div>
@@ -434,7 +443,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; backg
 <div class="sheet-overlay" id="addProductSheet">
   <div class="sheet">
     <div class="handle"></div>
-    <h3>新增商品</h3>
+    <div class="sheet-header"><h3>新增商品</h3><button type="button" class="sheet-close" data-action="closeAddProductSheet">✕</button></div>
     <div class="form-label">商品名稱 *</div>
     <input type="text" id="newProdName" placeholder="例如：綠葵托特包" style="width:100%;padding:10px;border:1px solid #E5E5EA;border-radius:10px;font-size:14px;margin-bottom:4px;">
     <div class="form-label">單價 *</div>
@@ -454,7 +463,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; backg
 <div class="sheet-overlay" id="editInvSheet">
   <div class="sheet">
     <div class="handle"></div>
-    <h3 id="editInvTitle">修改庫存</h3>
+    <div class="sheet-header"><h3 id="editInvTitle">修改庫存</h3><button type="button" class="sheet-close" data-action="closeEditInvSheet">✕</button></div>
     <div class="form-label">數量</div>
     <input type="number" id="editInvQty" style="width:100%;padding:12px;border:1px solid #E5E5EA;border-radius:10px;font-size:18px;font-weight:600;text-align:center;">
     <button type="button" class="primary-btn" data-action="saveEditInv">儲存</button>
@@ -466,7 +475,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; backg
 <div class="sheet-overlay" id="editSaleSheet">
   <div class="sheet">
     <div class="handle"></div>
-    <h3>修改銷售紀錄</h3>
+    <div class="sheet-header"><h3>修改銷售紀錄</h3><button type="button" class="sheet-close" data-action="closeEditSaleSheet">✕</button></div>
     <div class="form-label">數量</div>
     <input type="number" id="editSaleQty" min="1" style="width:100%;padding:12px;border:1px solid #E5E5EA;border-radius:10px;font-size:18px;font-weight:600;text-align:center;">
     <div class="form-label">讓利 %</div>
@@ -1291,6 +1300,7 @@ const actionMap = {
   syncFromSheet: () => { if(APPS_SCRIPT_URL) { showToast('同步中...'); fullSync().then(() => { renderDashboard(); renderInventory(); showToast('同步完成'); }); } else showToast('未設定同步'); },
   // Sell
   openSellSheet, addToCart, confirmSell,
+  closeSellSheet: () => closeSheet('sellSheet'),
   setSellChannel: id => { state.sellChannel=id; renderSellSheet(); },
   setSellProduct: id => { state.sellProduct=id; renderSellSheet(); },
   setSellSeries: id => { state.sellSeries=id; renderSellSheet(); },
@@ -1300,6 +1310,7 @@ const actionMap = {
   removeCart: id => { cart.splice(parseInt(id),1); renderCart(); },
   // Move
   openMoveSheet,
+  closeMoveSheet: () => closeSheet('moveSheet'),
   setMoveMode: id => { state.moveMode=id; renderMoveSheet(); },
   setMoveFrom: id => { state.moveFrom=id; renderMoveSheet(); },
   setMoveTo: id => { state.moveTo=id; renderMoveSheet(); },
@@ -1316,6 +1327,7 @@ const actionMap = {
   confirmStockIn,
   // Count
   openCountSheet,
+  closeCountSheet: () => closeSheet('countSheet'),
   setCountLoc: id => { state.countLoc=id; renderCountSheet(); },
   saveCount,
   // Inv
