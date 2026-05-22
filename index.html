@@ -615,14 +615,20 @@ const SEED_INVENTORY = {
   "eslite-young":{}
 };
 
-// Init inventory: seed from reconstruction if empty
-if (Object.keys(inventory).length === 0) {
+// Inventory version — bump this number whenever SEED_INVENTORY is updated
+const SEED_VERSION = 2; // v2: 2026-05-22 全面更新庫存+調價+新品
+const lastSeedVersion = loadData('seedVersion', 0);
+
+// Re-seed inventory if version changed or if empty
+if (Object.keys(inventory).length === 0 || lastSeedVersion < SEED_VERSION) {
+  inventory = {};
   ALL_LOCATIONS.forEach(loc => { inventory[loc.id] = {}; });
   // Apply seed data
   Object.keys(SEED_INVENTORY).forEach(lid => {
     Object.keys(SEED_INVENTORY[lid]).forEach(pid => { inventory[lid][pid] = SEED_INVENTORY[lid][pid]; });
   });
   saveData('inventory', inventory);
+  saveData('seedVersion', SEED_VERSION);
 }
 ALL_LOCATIONS.forEach(loc => { if (!inventory[loc.id]) inventory[loc.id] = {}; PRODUCTS.forEach(p => { if (inventory[loc.id][p.id] === undefined) inventory[loc.id][p.id] = 0; }); });
 
