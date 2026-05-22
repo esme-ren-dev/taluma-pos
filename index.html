@@ -610,13 +610,13 @@ let cart = [];
 const SEED_INVENTORY = {
   "home":{},
   "consign-sg":{"gk-tote":1,"gk-flat":2,"gk-sm":1,"bk-tote":2,"bk-flat":2,"rq-tote":4,"rq-flat":2,"rq-sm":1,"lq-tote":2,"lq-flat":2,"ab-flat":2,"rd-sock":13},
-  "consign-by":{"gk-flat":1,"gk-sm":1,"gk-hair":4,"bk-cos":3,"bk-flat":4,"bk-sm":4,"bk-hair":3,"rq-cos":2,"rq-flat":3,"rq-hair":4,"lq-cos":1,"lq-flat":2,"lq-sm":2,"lq-hair":2,"sd-zip":1},
-  "consign-jg":{"gk-tote":1,"gk-hair":1,"bk-hair":2,"rq-flat":1,"rq-hair":2,"lq-hair":1,"rd-sock":1},
+  "consign-by":{"gk-flat":1,"gk-sm":1,"gk-hair":5,"bk-cos":3,"bk-flat":4,"bk-sm":4,"bk-hair":5,"rq-cos":2,"rq-flat":4,"rq-hair":6,"lq-cos":1,"lq-flat":2,"lq-sm":2,"lq-hair":3,"sd-zip":1,"gk-tote":1,"rd-sock":1},
+  "consign-jg":{},
   "eslite-young":{"gk-tote":3,"gk-flat":6,"gk-sm":3,"gk-hair":22,"bk-tote":2,"bk-cos":2,"bk-flat":4,"bk-sm":3,"bk-hair":21,"rq-tote":3,"rq-cos":2,"rq-flat":6,"rq-sm":9,"rq-hair":9,"lq-tote":1,"lq-cos":2,"lq-flat":5,"lq-sm":3,"lq-hair":7,"ab-cos":3,"ab-sm":4,"bm-flat":3,"rc-hair":3,"hz-hair":12,"wb-flat":1,"cg-hair":10,"hw-hair":3,"yg-hair":8,"sd-zip":2,"ry-hair":12,"bch-hair":11,"lbch-hair":2,"gc-hair":1,"bs-hair":1,"hr-hair":6,"mg-hair":6,"ab-tote":2,"lbs-flat":1,"sd-flat":1,"pb-tote":2,"pb-sm":2,"mb-sm":1,"dd-sm":1,"lg-hair":8}
 };
 
 // Inventory version — bump this number whenever SEED_INVENTORY is updated
-const SEED_VERSION = 4; // v4: 2026-05-22 總倉全部調貨至誠品肖年頭家
+const SEED_VERSION = 5; // v5: 2026-05-22 集光市庫存併入邊緣工事
 const lastSeedVersion = loadData('seedVersion', 0);
 
 // Re-seed inventory if version changed or if empty
