@@ -590,6 +590,8 @@ const LEGACY_PRODUCTS = [
   {id:'mb-sm',name:'米色帆布小包',price:490,series:'米色帆布',type:'小包',season:'selected'},
   {id:'dd-sm',name:'深咖丹寧小包',price:490,series:'深咖丹寧',type:'小包',season:'selected'},
   {id:'lg-hair',name:'淺灰格紋髮圈',price:250,series:'淺灰格紋',type:'髮圈',season:'selected'},
+  // 2026-05-25 新增
+  {id:'hw-flat',name:'花窗扁包',price:490,series:'花窗',type:'扁包',season:'legacy'},
 ];
 
 let customProducts = loadData('customProducts', []);
@@ -606,17 +608,17 @@ let moveLog = loadData('moveLog', []);
 let orderCounter = loadData('orderCounter', 0);
 let cart = [];
 
-// Inventory snapshot from CSV (2026-05-22)
+// Inventory snapshot from CSV (2026-05-25)
 const SEED_INVENTORY = {
-  "home":{},
-  "consign-sg":{"gk-tote":1,"gk-flat":2,"gk-sm":1,"bk-tote":2,"bk-flat":2,"rq-tote":4,"rq-flat":2,"rq-sm":1,"lq-tote":2,"lq-flat":2,"ab-flat":2,"rd-sock":13},
-  "consign-by":{"gk-flat":1,"gk-sm":1,"gk-hair":5,"bk-cos":3,"bk-flat":4,"bk-sm":4,"bk-hair":5,"rq-cos":2,"rq-flat":4,"rq-hair":6,"lq-cos":1,"lq-flat":2,"lq-sm":2,"lq-hair":3,"sd-zip":1,"gk-tote":1,"rd-sock":1},
-  "consign-jg":{},
-  "eslite-young":{"gk-tote":3,"gk-flat":6,"gk-sm":3,"gk-hair":22,"bk-tote":2,"bk-cos":2,"bk-flat":4,"bk-sm":3,"bk-hair":21,"rq-tote":3,"rq-cos":2,"rq-flat":6,"rq-sm":9,"rq-hair":9,"lq-tote":1,"lq-cos":2,"lq-flat":5,"lq-sm":3,"lq-hair":7,"ab-cos":3,"ab-sm":4,"bm-flat":3,"rc-hair":3,"hz-hair":12,"wb-flat":1,"cg-hair":10,"hw-hair":3,"yg-hair":8,"sd-zip":2,"ry-hair":12,"bch-hair":11,"lbch-hair":2,"gc-hair":1,"bs-hair":1,"hr-hair":6,"mg-hair":6,"ab-tote":2,"lbs-flat":1,"sd-flat":1,"pb-tote":2,"pb-sm":2,"mb-sm":1,"dd-sm":1,"lg-hair":8}
+  "home":{"ab-cos":3,"ab-sm":4,"ab-tote":2,"bch-hair":11,"bk-cos":2,"bk-flat":4,"bk-hair":21,"bk-sm":3,"bk-tote":2,"bm-flat":3,"bs-hair":1,"cg-hair":10,"dd-sm":1,"gc-hair":1,"gk-flat":6,"gk-hair":22,"gk-sm":3,"gk-tote":3,"hr-hair":6,"hw-hair":3,"hz-hair":12,"lbch-hair":2,"lbs-flat":1,"lg-hair":8,"lq-cos":2,"lq-flat":5,"lq-hair":7,"lq-sm":3,"lq-tote":1,"mb-sm":1,"mg-hair":6,"pb-sm":2,"pb-tote":2,"rc-hair":3,"rq-cos":2,"rq-flat":6,"rq-hair":9,"rq-sm":9,"rq-tote":3,"ry-hair":12,"sd-flat":1,"sd-zip":2,"wb-flat":1,"yg-hair":8},
+  "consign-sg":{"ab-flat":2,"bk-flat":2,"bk-tote":2,"gk-flat":2,"gk-sm":1,"gk-tote":1,"lq-flat":2,"lq-tote":2,"rd-sock":13,"rq-flat":2,"rq-sm":1,"rq-tote":4},
+  "consign-by":{"ab-flat":-1,"bk-cos":1,"bk-flat":-1,"dd-sm":-1,"gk-hair":1,"lq-cos":1,"lq-sm":1,"mb-sm":-1,"rq-flat":1,"rq-hair":1,"rq-sm":-1,"wb-flat":-1,"wb-hair":-1,"yg-hair":-3,"yj-hair":-1},
+  "consign-jg":{"bk-hair":2,"gk-hair":1,"gk-tote":1,"lq-hair":1,"rd-sock":1,"rq-flat":1,"rq-hair":2},
+  "eslite-young":{"bk-cos":2,"bk-flat":5,"bk-hair":3,"bk-sm":4,"dd-sm":1,"gk-flat":1,"gk-hair":3,"gk-sm":1,"hw-flat":1,"lq-flat":2,"lq-hair":2,"lq-sm":1,"mb-sm":1,"rq-cos":2,"rq-flat":2,"rq-hair":3,"rq-sm":1,"sd-zip":1,"wb-flat":1,"yg-hair":3}
 };
 
 // Inventory version — bump this number whenever SEED_INVENTORY is updated
-const SEED_VERSION = 5; // v5: 2026-05-22 集光市庫存併入邊緣工事
+const SEED_VERSION = 6; // v6: 2026-05-25 邊緣工事調貨至誠品南西肖年頭家 + 新增花窗扁包
 const lastSeedVersion = loadData('seedVersion', 0);
 
 // Re-seed inventory if version changed or if empty
